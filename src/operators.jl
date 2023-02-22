@@ -48,8 +48,9 @@ order accurate finite differences are used on the first and last
 points of the grid respectively
 """
 
-function DX!(f_X::Matrix,
- f::Matrix, sys::System) NX, Nz = size(f) odX2 = 0.5 / sys.hX
+function DX!(f_X::Matrix, f::Matrix, sys::System)
+    NX, Nz = size(f)
+    odX2 = 0.5 / sys.hX
 
     @inbounds for j in 1:Nz
         @inbounds for i in 2:NX-1

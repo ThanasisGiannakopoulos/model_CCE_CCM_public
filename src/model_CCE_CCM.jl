@@ -14,10 +14,10 @@ using Random
     NX                :: Int
     Nz                :: Int
     Nρ                :: Int
-    ρmin              :: Float64
-    ρmax              :: Float64
-    xmin              :: Float64
-    xmax              :: Float64
+    ρmin              :: Float64 = -1.0
+    ρmax              :: Float64 =  0.0
+    Xmin              :: Float64 =  0.0
+    Xmax              :: Float64 =  1.0
     tmax              :: Float64
     # directory to save data
     out_dir           :: String
@@ -181,6 +181,7 @@ cibvp.aij and cibvp.bij, are parameters that control the structure of
 the principal part and sources (respectively) of the intrisic
 equations for the CIBVP.
  """
+
 # mutates dv
 function intrinsic_eq_rhs!(dv::Matrix, v::Matrix,
                            S::Vector,
@@ -199,6 +200,7 @@ end
 trapezoidal rule to solve the explicitly solve the instrinsic
 equations of the CIBVP
 """
+
 # mutates vf
 function trapez!(hX::Float64,
                  vf::Matrix,
@@ -334,7 +336,6 @@ function time_evol_ibvp_cibvp!(t::Float64, dt::Float64,
         v[1,j,2] = ψv1_BD(t+dt, sys.z[j], ibvp)
         ## BD from right boundary of Cauchy, that touches characteristic domain
         v[end,j,3] = ψ1_BD(t+dt, sys.z[j], ibvp) # prescribed BD from example file; it does NOT come from the CIBVP
-        #
         # incoming boundary data from future null infinity
         v[end,j,4] = ψ2_BD(t+dt, sys.z[j], cibvp)
     
@@ -440,16 +441,15 @@ function run_ibvp_cibvp(p::Param, ibvp::IBVP, cibvp::CIBVP)
              v[:,:,1], v[:,:,2], v[:,:,3],
              null_v[:,:,1], null_v[:,:,2], v[:,:,4])
     # v = [ϕ1, ψv1, ψ1, ψ2, ψv2, ϕ2]
-
     
     #println("number of threads = ", Threads.nthreads())
+    println("Running IBVP and CIBVP separately")
     println("-------------------------------------------------------------")
     println("Iteration      Time |           ψ2            |           ψ1           |           ϕ2            ")
     println("                    |    minimum      maximum |    minimum      maximum |    minimum      maximum |")
     println("-------------------------------------------------------------")
     
     @printf "%9d %9.3f |  %9.4g    %9.4g|  %9.4g    %9.4g|  %9.4g    %9.4g\n" it t minimum(v[:,:,4]) maximum(v[:,:,4]) minimum(v[:,:,3]) maximum(v[:,:,3]) minimum(null_v[:,:,1]) maximum(null_v[:,:,1])
-
     
     # start time evolution
     while t<tmax
@@ -506,8 +506,8 @@ function setup_rhs_cce!(t::Float64,
         v[end,j,3] = ψ1_BD(t, sys.z[j], ibvp) # for CCE: prescribed BD for the left-moving field of the IBVP
         
         # BD for null integration
-        null_v[1,j,1] =  v[end,:,1] # for CCE: ϕ2[1,:] = ϕ1[end,:]; right-moving, pass information from the Cauchy to the characteristic domain
-        null_v[1,j,2] =  v[end,:,2] # for CCE: ψv2[1,:] = ψv1[end,:]; right-moving, pass information from the Cauchy to the characteristic domain
+        null_v[1,j,1] =  v[end,j,1] # for CCE: ϕ2[1,:] = ϕ1[end,:]; right-moving, pass information from the Cauchy to the characteristic domain
+        null_v[1,j,2] =  v[end,j,2] # for CCE: ψv2[1,:] = ψv1[end,:]; right-moving, pass information from the Cauchy to the characteristic domain
     end
     
     # null integration
@@ -587,14 +587,13 @@ function time_evol_cce!(t::Float64, dt::Float64,
         v[1,j,2] = ψv1_BD(t+dt, sys.z[j], ibvp)
         ## BD from right boundary of Cauchy, that touches characteristic domain
         v[end,j,3] = ψ1_BD(t+dt, sys.z[j], ibvp) # for CCE: prescribed BD for the left-moving field of the IBVP
-        #
         # incoming boundary data from the right boundary of the CIBVP
         v[end,j,4] = ψ2_BD(t+dt, sys.z[j], cibvp)
     
         # update ϕ2 and ψv2 as well
         # BD for null integration
-        null_v[1,j,1] = v[end,:,1] # for CCE: ϕ2[1,:] = ϕ1[end,:]; right-moving, pass information from the Cauchy to the characteristic domain
-        null_v[1,j,2] = v[end,:,2] # for CCE: ψv2[1,:] = ψv1[end,:]; right-moving, pass information from the Cauchy to the characteristic domain
+        null_v[1,j,1] = v[end,j,1] # for CCE: ϕ2[1,:] = ϕ1[end,:]; right-moving, pass information from the Cauchy to the characteristic domain
+        null_v[1,j,2] = v[end,j,2] # for CCE: ψv2[1,:] = ψv1[end,:]; right-moving, pass information from the Cauchy to the characteristic domain
 
     end
     
@@ -661,8 +660,8 @@ function run_cce(p::Param, ibvp::IBVP, cibvp::CIBVP)
     
         # find initial ϕ2 and ψv2 as well
         # BD for null integration
-        null_v[1,j,1] = v[end,:,1] # for CCE: ϕ2[1,:] = ϕ1[end,:]; right-moving, pass information from the Cauchy to the characteristic domain
-        null_v[1,j,2] = v[end,:,2] # for CCE: ψv2[1,:] = ψv1[end,:]; right-moving, pass information from the Cauchy to the characteristic domain
+        null_v[1,j,1] = v[end,j,1] # for CCE: ϕ2[1,:] = ϕ1[end,:]; right-moving, pass information from the Cauchy to the characteristic domain
+        null_v[1,j,2] = v[end,j,2] # for CCE: ψv2[1,:] = ψv1[end,:]; right-moving, pass information from the Cauchy to the characteristic domain
         
     end
     
@@ -692,16 +691,15 @@ function run_cce(p::Param, ibvp::IBVP, cibvp::CIBVP)
              v[:,:,1], v[:,:,2], v[:,:,3],
              null_v[:,:,1], null_v[:,:,2], v[:,:,4])
     # v = [ϕ1, ψv1, ψ1, ψ2, ψv2, ϕ2]
-
     
     #println("number of threads = ", Threads.nthreads())
-    println("-------------------------------------------------------------")
+    println("Running CCE")
+        println("-------------------------------------------------------------")
     println("Iteration      Time |           ψ2            |           ψ1           |           ϕ2            ")
     println("                    |    minimum      maximum |    minimum      maximum |    minimum      maximum |")
     println("-------------------------------------------------------------")
     
     @printf "%9d %9.3f |  %9.4g    %9.4g|  %9.4g    %9.4g|  %9.4g    %9.4g\n" it t minimum(v[:,:,4]) maximum(v[:,:,4]) minimum(v[:,:,3]) maximum(v[:,:,3]) minimum(null_v[:,:,1]) maximum(null_v[:,:,1])
-
     
     # start time evolution
     while t<tmax
@@ -758,8 +756,8 @@ function setup_rhs_ccm!(t::Float64,
         v[end,j,3] = v[1,j,4] # for CCM: ψ1[end,j] = ψ2[1,j]; left-moving, pass information from the characteristic to the Cauchy domain
         
         # BD for null integration
-        null_v[1,j,1] =  v[end,:,1] # for CCM: ϕ2[1,:] = ϕ1[end,:]; right-moving, pass information from the Cauchy to the characteristic domain
-        null_v[1,j,2] =  v[end,:,2] # for CCM: ψv2[1,:] = ψv1[end,:]; right-moving, pass information from the Cauchy to the characteristic domain
+        null_v[1,j,1] =  v[end,j,1] # for CCM: ϕ2[1,:] = ϕ1[end,:]; right-moving, pass information from the Cauchy to the characteristic domain
+        null_v[1,j,2] =  v[end,j,2] # for CCM: ψv2[1,:] = ψv1[end,:]; right-moving, pass information from the Cauchy to the characteristic domain
     end
     
     # null integration
@@ -839,14 +837,13 @@ function time_evol_ccm!(t::Float64, dt::Float64,
         v[1,j,2] = ψv1_BD(t+dt, sys.z[j], ibvp)
         ## BD from right boundary of Cauchy, that touches characteristic domain
         v[end,j,3] = v[1,j,4] # for CCM: ψ1[end,j] = ψ2[1,j]; left-moving, pass information from the characteristic to the Cauchy domain
-        #
         # incoming boundary data from future null infinity
         v[end,j,4] = ψ2_BD(t+dt, sys.z[j], cibvp)
     
         # update ϕ2 and ψv2 as well
         # BD for null integration
-        null_v[1,j,1] = v[end,:,1] # for CCM: ϕ2[1,:] = ϕ1[end,:]; right-moving, pass information from the Cauchy to the characteristic domain
-        null_v[1,j,2] = v[end,:,2] # for CCM: ψv2[1,:] = ψv1[end,:]; right-moving, pass information from the Cauchy to the characteristic domain
+        null_v[1,j,1] = v[end,j,1] # for CCM: ϕ2[1,:] = ϕ1[end,:]; right-moving, pass information from the Cauchy to the characteristic domain
+        null_v[1,j,2] = v[end,j,2] # for CCM: ψv2[1,:] = ψv1[end,:]; right-moving, pass information from the Cauchy to the characteristic domain
 
     end
     
@@ -914,9 +911,8 @@ function run_ccm(p::Param, ibvp::IBVP, cibvp::CIBVP)
     
         # find initial ϕ2 and ψv2 as well
         # BD for null integration
-        null_v[1,j,1] = v[end,:,1] # for CCM: ϕ2[1,:] = ϕ1[end,:]; right-moving, pass information from the Cauchy to the characteristic domain
-        null_v[1,j,2] = v[end,:,2] # for CCM: ψv2[1,:] = ψv1[end,:]; right-moving, pass information from the Cauchy to the characteristic domain
-        
+        null_v[1,j,1] = v[end,j,1] # for CCM: ϕ2[1,:] = ϕ1[end,:]; right-moving, pass information from the Cauchy to the characteristic domain
+        null_v[1,j,2] = v[end,j,2] # for CCM: ψv2[1,:] = ψv1[end,:]; right-moving, pass information from the Cauchy to the characteristic domain
     end
     
     # null integration
@@ -945,16 +941,15 @@ function run_ccm(p::Param, ibvp::IBVP, cibvp::CIBVP)
              v[:,:,1], v[:,:,2], v[:,:,3],
              null_v[:,:,1], null_v[:,:,2], v[:,:,4])
     # v = [ϕ1, ψv1, ψ1, ψ2, ψv2, ϕ2]
-
     
     #println("number of threads = ", Threads.nthreads())
+    println("Running CCM")
     println("-------------------------------------------------------------")
     println("Iteration      Time |           ψ2            |           ψ1           |           ϕ2            ")
     println("                    |    minimum      maximum |    minimum      maximum |    minimum      maximum |")
     println("-------------------------------------------------------------")
     
     @printf "%9d %9.3f |  %9.4g    %9.4g|  %9.4g    %9.4g|  %9.4g    %9.4g\n" it t minimum(v[:,:,4]) maximum(v[:,:,4]) minimum(v[:,:,3]) maximum(v[:,:,3]) minimum(null_v[:,:,1]) maximum(null_v[:,:,1])
-
     
     # start time evolution
     while t<tmax
