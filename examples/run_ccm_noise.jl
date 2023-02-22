@@ -4,9 +4,9 @@ using Parameters
 using Random
 
 @with_kw struct noise_ibvp <: IBVP
-    noise_amp_ϕ1  :: Float64
-    noise_amp_ψv1 :: Float64
-    noise_amp_ψ1  :: Float64
+    noise_amp_ϕ1  :: Float64 = 0.0
+    noise_amp_ψv1 :: Float64 = 0.0
+    noise_amp_ψ1  :: Float64 = 0.0
     # speeds (absolute value)
     vϕ1 :: Float64 = 1.0 # right moving
     vψv1:: Float64 = 1.0 # right moving
@@ -34,9 +34,9 @@ using Random
 end
 
 @with_kw struct noise_cibvp <: CIBVP
-    noise_amp_ϕ2  :: Float64
-    noise_amp_ψv2 :: Float64
-    noise_amp_ψ2  :: Float64
+    noise_amp_ϕ2  :: Float64 = 0.0
+    noise_amp_ψv2 :: Float64 = 0.0
+    noise_amp_ψ2  :: Float64 = 0.0
     # speed of ψ2 (absolute value). To match with vψ1 (in char. frame), vψ2 = vψ1/(1+vψ1)
     vψ2 :: Float64 = 0.5 # left moving
     # components of Az principal matrix
@@ -78,24 +78,18 @@ model_CCE_CCM.ϕ1_BD(t::T, z::T, ibvp::noise_ibvp) where {T<:Real} =
     ibvp.noise_amp_ϕ1 * randn(T)
 model_CCE_CCM.ψv1_BD(t::T, z::T, ibvp::noise_ibvp) where {T<:Real} =
     ibvp.noise_amp_ψv1 * randn(T)
-model_CCE_CCM.ψ1_BD(t::T, z::T, ibvp::noise_ibvp) where {T<:Real} =
-    ibvp.noise_amp_ψ1 * randn(T)
-# Characteristic initial data
+# characteristic initial data
 model_CCE_CCM.ψ2_ID(ρ::T, z::T, cibvp::noise_cibvp) where {T<:Real} =
     cibvp.noise_amp_ψ2 * randn(T)
 # characteristic boundary data
-model_CCE_CCM.ϕ2_BD(t::T, z::T, cibvp::noise_cibvp) where {T<:Real} =
-    cibvp.noise_amp_ϕ2 * randn(T)
-model_CCE_CCM.ψv2_BD(t::T, z::T, cibvp::noise_cibvp) where {T<:Real} =
-    cibvp.noise_amp_ψv2 * randn(T)
 model_CCE_CCM.ψ2_BD(t::T, z::T, cibvp::noise_cibvp) where {T<:Real} =
     cibvp.noise_amp_ψ2 * randn(T)
 
-toy_model = "SYMH_SYMH_noise_t20_L2_amp"
+toy_model = "SYMH_WH_noise_t20_H1_amp"
 root_dir="./run_ccm/"
 
 # change D for number of points
-D = 0
+D = 4
 Nρ = (16)*2^D + 1
 NX = Nρ
 Nz = 16*2^D #16 coarse
@@ -123,9 +117,9 @@ p = Param(
 
 # the sate vector is v1 = [ϕ1, ψv1, ψ1]
 ibvp = noise_ibvp(
-    noise_amp_ϕ1  = noise_amplitude_drop_a^D,
-    noise_amp_ψv1 = noise_amplitude_drop_a^D,
-    noise_amp_ψ1  = noise_amplitude_drop_a^D,
+    noise_amp_ϕ1  = noise_amplitude_drop_b^D,
+    noise_amp_ψv1 = noise_amplitude_drop_b^D,
+    noise_amp_ψ1  = noise_amplitude_drop_b^D,
     # Az principal part
     az11 =  0.0,
     az12 =  1.0, # 1.0 for SYMH, 0.0 for WH
@@ -150,14 +144,12 @@ ibvp = noise_ibvp(
 
 # the sate vector is v2 = [ϕ2, ψv2, ψ2]
 cibvp = noise_cibvp(
-    noise_amp_ϕ2  = noise_amplitude_drop_a^D,
-    noise_amp_ψv2 = noise_amplitude_drop_a^D,
-    noise_amp_ψ2  = noise_amplitude_drop_a^D,
+    noise_amp_ψ2  = noise_amplitude_drop_b^D,
     # left-moving speed
     # vψ2 = 0.5,
     # Az principal part
     az11 =  0.0,
-    az12 =  1.0, # 1.0 SYMH; 0.0 WH
+    az12 =  0.0, # 1.0 SYMH; 0.0 WH
     az13 =  0.0,
     az21 =  1.0,
     az22 =  0.0,
