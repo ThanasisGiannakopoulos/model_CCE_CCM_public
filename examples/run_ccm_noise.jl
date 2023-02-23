@@ -74,22 +74,27 @@ model_CCE_CCM.ψv1_ID(ρ::T, z::T, ibvp::noise_ibvp) where {T<:Real} =
 model_CCE_CCM.ψ1_ID(ρ::T, z::T, ibvp::noise_ibvp) where {T<:Real} =
     ibvp.noise_amp_ψ1 * randn(T)
 # Cauchy boundary data
+# right-moving:
 model_CCE_CCM.ϕ1_BD(t::T, z::T, ibvp::noise_ibvp) where {T<:Real} =
     ibvp.noise_amp_ϕ1 * randn(T)
 model_CCE_CCM.ψv1_BD(t::T, z::T, ibvp::noise_ibvp) where {T<:Real} =
     ibvp.noise_amp_ψv1 * randn(T)
+# the left-moving BD for the IBVP is given by the solution to the CIBVP for CCM
 # characteristic initial data
 model_CCE_CCM.ψ2_ID(ρ::T, z::T, cibvp::noise_cibvp) where {T<:Real} =
     cibvp.noise_amp_ψ2 * randn(T)
 # characteristic boundary data
+# left-moving:
 model_CCE_CCM.ψ2_BD(t::T, z::T, cibvp::noise_cibvp) where {T<:Real} =
     cibvp.noise_amp_ψ2 * randn(T)
+# the right-moving BD for the CIBVP is given by the solution to the IBVP
 
-toy_model = "SYMH_WH_noise_t20_H1_amp"
+# change the name according to the setup you are solving (models + given data)
+toy_model = "WH_WH_noise_t20_H1_amp" 
 root_dir="./run_ccm/"
 
 # change D for number of points
-D = 4
+D = 0
 Nρ = (16)*2^D + 1
 NX = Nρ
 Nz = 16*2^D #16 coarse
@@ -97,6 +102,11 @@ Nz = 16*2^D #16 coarse
 noise_amplitude_drop_a = 0.25 
 # given data noise amplitude drop for fields WITH derivatives in the norm:
 noise_amplitude_drop_b = 0.125
+
+# copy parfile in outdir
+par_copy = joinpath(root_dir, toy_model, "data_$(NX)_$(Nz)/run_ccm_noise.jl")
+mkpath(par_copy)
+cp("./run_ccm_noise.jl", par_copy, force=true)
 
 # parameters to be passed in the model
 p = Param(
@@ -117,19 +127,20 @@ p = Param(
 
 # the sate vector is v1 = [ϕ1, ψv1, ψ1]
 ibvp = noise_ibvp(
-    noise_amp_ϕ1  = noise_amplitude_drop_b^D,
+    # for given data that converge in q-norm, a->b ONLY below; for H1, a->b everywhere
+    noise_amp_ϕ1  = noise_amplitude_drop_b^D, 
     noise_amp_ψv1 = noise_amplitude_drop_b^D,
     noise_amp_ψ1  = noise_amplitude_drop_b^D,
     # Az principal part
     az11 =  0.0,
-    az12 =  1.0, # 1.0 for SYMH, 0.0 for WH
-    az13 =  0.0, 
-    az21 =  1.0, # 1.0 for SYMH
+    az12 =  0.0, # 1.0 for SYMH, 0.0 for WH
+    az13 =  0.0,
+    az21 =  1.0,
     az22 =  0.0,
     az23 =  0.0, 
     az31 =  0.0,
     az32 =  0.0, 
-    az33 =  1.0, # 1.0 for SYMH
+    az33 =  1.0,
     # sources
     b11 =  0.0,
     b12 =  0.0,
@@ -139,11 +150,14 @@ ibvp = noise_ibvp(
     b23 =  0.0,
     b31 =  0.0,
     b32 =  0.0,
-    b33 =  0.0    
+    b33 =  0.0
 )
 
 # the sate vector is v2 = [ϕ2, ψv2, ψ2]
 cibvp = noise_cibvp(
+    # the commented out are not needed for CCM
+    # noise_amp_ϕ2 = noise_amplitude_drop_a^D,
+    # noise_amp_ψ2  = noise_amplitude_drop_a^D,
     noise_amp_ψ2  = noise_amplitude_drop_b^D,
     # left-moving speed
     # vψ2 = 0.5,
@@ -166,7 +180,7 @@ cibvp = noise_cibvp(
     b23 =  0.0,
     b31 =  0.0,
     b32 =  0.0,
-    b33 =  0.0    
+    b33 =  0.0  
 )
 
 run_ccm(p, ibvp, cibvp)

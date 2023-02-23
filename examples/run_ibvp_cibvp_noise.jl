@@ -4,9 +4,9 @@ using Parameters
 using Random
 
 @with_kw struct noise_ibvp <: IBVP
-    noise_amp_ϕ1  :: Float64
-    noise_amp_ψv1 :: Float64
-    noise_amp_ψ1  :: Float64
+    noise_amp_ϕ1  :: Float64 = 0.0
+    noise_amp_ψv1 :: Float64 = 0.0
+    noise_amp_ψ1  :: Float64 = 0.0
     # speeds (absolute value)
     vϕ1 :: Float64 = 1.0 # right moving
     vψv1:: Float64 = 1.0 # right moving
@@ -34,9 +34,9 @@ using Random
 end
 
 @with_kw struct noise_cibvp <: CIBVP
-    noise_amp_ϕ2  :: Float64
-    noise_amp_ψv2 :: Float64
-    noise_amp_ψ2  :: Float64
+    noise_amp_ϕ2  :: Float64 = 0.0
+    noise_amp_ψv2 :: Float64 = 0.0
+    noise_amp_ψ2  :: Float64 = 0.0
     # speed of ψ2 (absolute value). To match with vψ1 (in char. frame), vψ2 = vψ1/(1+vψ1)
     vψ2 :: Float64 = 0.5 # left moving
     # components of Az principal matrix
@@ -104,6 +104,11 @@ noise_amplitude_drop_a = 0.25
 # given data noise amplitude drop for fields WITH derivatives in the norm:
 noise_amplitude_drop_b = 0.125
 
+# copy parfile in outdir
+par_copy = joinpath(root_dir, toy_model, "data_$(NX)_$(Nz)/run_ibvp_cibvp_noise.jl")
+mkpath(par_copy)
+cp("./run_ibvp_cibvp_noise.jl", par_copy, force=true)
+
 # parameters to be passed in the model
 p = Param(
     NX = NX,
@@ -123,6 +128,7 @@ p = Param(
 
 # the sate vector is v1 = [ϕ1, ψv1, ψ1]
 ibvp = noise_ibvp(
+    # for given data that converge in q-norm, a->b ϕ1 and ϕ2 amp; for H1, a->b everywhere
     noise_amp_ϕ1  = noise_amplitude_drop_a^D,
     noise_amp_ψv1 = noise_amplitude_drop_a^D,
     noise_amp_ψ1  = noise_amplitude_drop_a^D,
@@ -150,6 +156,7 @@ ibvp = noise_ibvp(
 
 # the sate vector is v2 = [ϕ2, ψv2, ψ2]
 cibvp = noise_cibvp(
+    # for given data that converge in q-norm, a->b ϕ1 and ϕ2 amp; for H1, a->b everywhere
     noise_amp_ϕ2  = noise_amplitude_drop_a^D,
     noise_amp_ψv2 = noise_amplitude_drop_a^D,
     noise_amp_ψ2  = noise_amplitude_drop_a^D,

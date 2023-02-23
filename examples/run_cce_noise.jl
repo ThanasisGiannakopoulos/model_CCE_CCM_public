@@ -4,9 +4,9 @@ using Parameters
 using Random
 
 @with_kw struct noise_ibvp <: IBVP
-    noise_amp_ϕ1  :: Float64
-    noise_amp_ψv1 :: Float64
-    noise_amp_ψ1  :: Float64
+    noise_amp_ϕ1  :: Float64 = 0.0
+    noise_amp_ψv1 :: Float64 = 0.0
+    noise_amp_ψ1  :: Float64 = 0.0
     # speeds (absolute value)
     vϕ1 :: Float64 = 1.0 # right moving
     vψv1:: Float64 = 1.0 # right moving
@@ -34,9 +34,9 @@ using Random
 end
 
 @with_kw struct noise_cibvp <: CIBVP
-    noise_amp_ϕ2  :: Float64
-    noise_amp_ψv2 :: Float64
-    noise_amp_ψ2  :: Float64
+    noise_amp_ϕ2  :: Float64 = 0.0
+    noise_amp_ψv2 :: Float64 = 0.0
+    noise_amp_ψ2  :: Float64 = 0.0
     # speed of ψ2 (absolute value). To match with vψ1 (in char. frame), vψ2 = vψ1/(1+vψ1)
     vψ2 :: Float64 = 0.5 # left moving
     # components of Az principal matrix
@@ -74,28 +74,30 @@ model_CCE_CCM.ψv1_ID(ρ::T, z::T, ibvp::noise_ibvp) where {T<:Real} =
 model_CCE_CCM.ψ1_ID(ρ::T, z::T, ibvp::noise_ibvp) where {T<:Real} =
     ibvp.noise_amp_ψ1 * randn(T)
 # Cauchy boundary data
+# right-moving:
 model_CCE_CCM.ϕ1_BD(t::T, z::T, ibvp::noise_ibvp) where {T<:Real} =
     ibvp.noise_amp_ϕ1 * randn(T)
 model_CCE_CCM.ψv1_BD(t::T, z::T, ibvp::noise_ibvp) where {T<:Real} =
     ibvp.noise_amp_ψv1 * randn(T)
+# left-moving:
+# below is different in CCM. Here in CCE, it is prescribed (external) given data
 model_CCE_CCM.ψ1_BD(t::T, z::T, ibvp::noise_ibvp) where {T<:Real} =
     ibvp.noise_amp_ψ1 * randn(T)
 # Characteristic initial data
 model_CCE_CCM.ψ2_ID(ρ::T, z::T, cibvp::noise_cibvp) where {T<:Real} =
     cibvp.noise_amp_ψ2 * randn(T)
 # characteristic boundary data
-model_CCE_CCM.ϕ2_BD(t::T, z::T, cibvp::noise_cibvp) where {T<:Real} =
-    cibvp.noise_amp_ϕ2 * randn(T)
-model_CCE_CCM.ψv2_BD(t::T, z::T, cibvp::noise_cibvp) where {T<:Real} =
-    cibvp.noise_amp_ψv2 * randn(T)
+# left-moving:
 model_CCE_CCM.ψ2_BD(t::T, z::T, cibvp::noise_cibvp) where {T<:Real} =
     cibvp.noise_amp_ψ2 * randn(T)
+# the right-moving BD for the CIBVP is given by the solution to the IBVP
 
-toy_model = "SYMH_SYMH_noise_t20_L2_amp"
+# change the name according to the setup you are solving (models + given data)
+toy_model = "SYMH_WH_noise_t20_L2_amp"
 root_dir="./run_cce/"
 
 # change D for number of points
-D = 0
+D = 4
 Nρ = (16)*2^D + 1
 NX = Nρ
 Nz = 16*2^D #16 coarse
@@ -103,6 +105,11 @@ Nz = 16*2^D #16 coarse
 noise_amplitude_drop_a = 0.25 
 # given data noise amplitude drop for fields WITH derivatives in the norm:
 noise_amplitude_drop_b = 0.125
+
+# copy parfile in outdir
+par_copy = joinpath(root_dir, toy_model, "data_$(NX)_$(Nz)/run_cce_noise.jl")
+mkpath(par_copy)
+cp("./run_cce_noise.jl", par_copy, force=true)
 
 # parameters to be passed in the model
 p = Param(
@@ -123,6 +130,7 @@ p = Param(
 
 # the sate vector is v1 = [ϕ1, ψv1, ψ1]
 ibvp = noise_ibvp(
+    # for given data that converge in q-norm, a->b ONLY below; for H1, a->b everywhere
     noise_amp_ϕ1  = noise_amplitude_drop_a^D,
     noise_amp_ψv1 = noise_amplitude_drop_a^D,
     noise_amp_ψ1  = noise_amplitude_drop_a^D,
@@ -130,12 +138,12 @@ ibvp = noise_ibvp(
     az11 =  0.0,
     az12 =  1.0, # 1.0 for SYMH, 0.0 for WH
     az13 =  0.0, 
-    az21 =  1.0, # 1.0 for SYMH
+    az21 =  1.0,
     az22 =  0.0,
     az23 =  0.0, 
     az31 =  0.0,
     az32 =  0.0, 
-    az33 =  1.0, # 1.0 for SYMH
+    az33 =  1.0,
     # sources
     b11 =  0.0,
     b12 =  0.0,
@@ -145,19 +153,20 @@ ibvp = noise_ibvp(
     b23 =  0.0,
     b31 =  0.0,
     b32 =  0.0,
-    b33 =  0.0    
+    b33 =  0.0
 )
 
 # the sate vector is v2 = [ϕ2, ψv2, ψ2]
 cibvp = noise_cibvp(
-    noise_amp_ϕ2  = noise_amplitude_drop_a^D,
-    noise_amp_ψv2 = noise_amplitude_drop_a^D,
+    # the commented out are not needed for CCM
+    # noise_amp_ϕ2 = noise_amplitude_drop_a^D,
+    # noise_amp_ψ2  = noise_amplitude_drop_a^D,
     noise_amp_ψ2  = noise_amplitude_drop_a^D,
     # left-moving speed
     # vψ2 = 0.5,
     # Az principal part
     az11 =  0.0,
-    az12 =  1.0, # 1.0 SYMH; 0.0 WH
+    az12 =  0.0, # 1.0 SYMH; 0.0 WH
     az13 =  0.0,
     az21 =  1.0,
     az22 =  0.0,
@@ -174,7 +183,7 @@ cibvp = noise_cibvp(
     b23 =  0.0,
     b31 =  0.0,
     b32 =  0.0,
-    b33 =  0.0    
+    b33 =  0.0  
 )
 
 run_cce(p, ibvp, cibvp)
