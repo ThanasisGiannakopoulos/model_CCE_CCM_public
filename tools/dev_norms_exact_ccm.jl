@@ -164,7 +164,7 @@ function dev_t_func(dir, dt0)
             dt0*dz*sum(ψ1[1,:].*ψ1[1,:])
 
         # H1 norm
-        H1_b[it] = dx*dz*sum(ψ2.*ψ2 .+ Dxψ2.*Dxψ2 .+ Dzψ2.*Dzψ2) +
+        H1[it] = dx*dz*sum(ψ2.*ψ2 .+ Dxψ2.*Dxψ2 .+ Dzψ2.*Dzψ2) +
             maximum(h1_out_x) +
             dρ*dz*sum(ϕ1.*ϕ1 .+ ψv1.*ψv1 .+ ψ1.*ψ1 .+
                       Dρϕ1.*Dρϕ1 .+ Dρψv1.*Dρψv1 .+ Dρψ1.*Dρψ1 .+
@@ -173,7 +173,7 @@ function dev_t_func(dir, dt0)
                                  Dzψ1[1,:].*Dzψ1[1,:])
     end
 
-    tt, q, H
+    tt, q, H1
     
 end
 
@@ -184,8 +184,8 @@ Nmax = 4
 Nρ = 17
 Nz = 16
 
-root_dir  = "/home/thanasis/repos/model_CCE_CCM_public/examples/run_ccm/"
-toy_model = "WH_WH_noise_t20_q_amp/"
+root_dir  = "/home/pmzag1/repos/model_CCE_CCM_public/examples/run_ccm/"
+toy_model = "WH_WH_noise_t20_H1_amp/"
 
 coarse_dir = joinpath(root_dir, toy_model, "data_$(Nρ)_$(Nz)")
 

@@ -124,8 +124,8 @@ Nmax = 4
 Nρ = 17
 Nz = 16
 
-root_dir  = "/home/thanasis/repos/model_CCE_CCM_public/examples/run_ccm/"
-toy_model = "SYMH_SYMH_noise_t20_L2_amp/"
+root_dir  = "/home/pmzag1/repos/model_CCE_CCM_public/examples/run_ccm/"
+toy_model = "WH_WH_noise_t20_L2_amp/"
 
 coarse_dir = joinpath(root_dir, toy_model, "data_$(Nρ)_$(Nz)")
 
