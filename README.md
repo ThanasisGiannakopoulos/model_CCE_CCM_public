@@ -5,14 +5,14 @@ The goal of this work is to analyze the numerical convergence of CCE and CCM
 for toy models that mimic the hyperbolic structure of the general relativistic PDE systems
 used in CCE and CCM. The implemented models are the following:
 
-- for the IBVP:
+- for the Initial Boundary Value Problem (IBVP):
 $$\partial_t \phi_1 = - v_{\phi_1} \partial_\rho \phi_1 + a_{z11} \partial_z \phi_1 + a_{z12} \partial_z \psi_{v 1} + a_{z13} \partial_z \psi_1 + b_{11} \phi_1 + b_{12} \psi_{v 1} + b_{13}\psi_1 $$ 
 
 $$\partial_t \psi_{v1} = - v_{\psi_{v1}} \partial_\rho \psi_{v1} + a_{z21} \partial_z \phi_1 + a_{z22} \partial_z \psi_{v 1} + a_{z23} \partial_z \psi_1 + b_{21} \phi_1 + b_{22} \psi_{v 1} + b_{23}\psi_1 $$
 
 $$\partial_t \psi_1 = v_{\psi_1} \partial_\rho \psi_1 + a_{z31} \partial_z \phi_1 + a_{z32} \partial_z \psi_{v 1} + a_{z33} \partial_z \psi_1 + b_{31} \phi_1 + b_{32} \psi_{v 1} + b_{33}\psi_1 $$
 
-- for the CIBVP:
+- for the Characteristic Initial Boundary Value PRoblem (CIBVP):
 $$\partial_x \phi_2 = a_{z11} \partial_z \phi_2 + a_{z12} \partial_z \psi_{v 2} + a_{z13} \partial_z \psi_2 + b_{11} \phi_2 + b_{12} \psi_{v 2} + b_{13}\psi_2 $$ 
 
 $$\partial_x \psi_{v2} = a_{z21} \partial_z \phi_2 + a_{z22} \partial_z \psi_{v 2} + a_{z23} \partial_z \psi_2 + b_{21} \phi_2 + b_{22} \psi_{v 2} + b_{23}\psi_2 $$
