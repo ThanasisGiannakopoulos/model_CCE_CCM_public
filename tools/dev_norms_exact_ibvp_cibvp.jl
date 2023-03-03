@@ -158,37 +158,126 @@ function norms_t_func(dir, dt0)
         # time
         tt[it]  = t
 
-        # get the characteristi outgoing part of the norm
-        q_out_x += dt0*dz*sum( ψv2.*ψv2 .+ ϕ2.*ϕ2 .+ Dzϕ2.*Dzϕ2, dims=2)
-        h1_out_x += dt0*dz*sum( ψv2.*ψv2 .+ ϕ2.*ϕ2 .+
-                                Dxψv2.*Dxψv2 .+ Dxϕ2.*Dxϕ2 .+
-                                Dzψv2.*Dzψv2 .+ Dzϕ2.*Dzϕ2, dims=2)
+        
+        # full
+        # for solution
+        q_cauchy_sol     = zeros(Nf)
+        q_char_sol       = zeros(Nf)
+        h1_cauchy_sol    = zeros(Nf)
+        h1_char_sol      = zeros(Nf)
+        # for given data
+        q_cauchy_given   = zeros(Nf)
+        q_char_given     = zeros(Nf)
+        h1_cauchy_given  = zeros(Nf)
+        h1_char_given    = zeros(Nf)
 
+        # temporary values for calculation of worldtube sums
+        # out stands for outgoing vars, in for ingoing vars
+        # characteristic
+        q_x_out     = zeros(length(ρ)) # sum for outgoing vars over all x
+        q_x_max_out = 0.0 # the max value of that sum, no necessarily xmax or xmin
+        h1_x_out     = zeros(length(ρ)) # sum for outgoing vars over all x
+        h1_x_max_out = 0.0 # the max value of that sum
+        q_xmin_out  = 0.0
+        q_xmax_in   = 0.0
+        h1_xmin_out  = 0.0
+        h1_xmax_in   = 0.0
+        
+        #cauchy
+        q_cauchy_ρmin_in  = 0.0
+        q_cauchy_ρmin_out = 0.0
+        q_cauchy_ρmax_in  = 0.0
+        q_cauchy_ρmax_out = 0.0
+        h1_cauchy_ρmin_in  = 0.0
+        h1_cauchy_ρmin_out = 0.0
+        h1_cauchy_ρmax_in  = 0.0
+        h1_cauchy_ρmax_out = 0.0
+
+        # Initial data
+        q_char_u0   = 0.0
+        q_cauchy_t0 = 0.0
+        h1_char_u0   = 0.0
+        h1_cauchy_t0 = 0.0
+
+        if i==1
+            println("computing initial data norm")
+            q_char_u0    = dx*dz*sum(ψ2.*ψ2)
+            q_cauchy_t0  = dρ*dz*sum(ϕ1.*ϕ1 .+ ψv1.*ψv1 .+ ψ1.*ψ1 .+ Dzϕ1.*Dzϕ1)
+            h1_char_u0   = dx*dz*sum(ψ2.*ψ2 .+ Dxψ2.*Dxψ2 .+ Dzψ2.*Dzψ2)
+            h1_cauchy_t0 = dρ*dz*sum(ϕ1.*ϕ1 .+ ψv1.*ψv1 .+ ψ1.*ψ1 .+
+                                     Dρϕ1.*Dρϕ1 .+ Dρψv1.*Dρψv1 .+ Dρψ1.*Dρψ1 .+
+                                     Dzϕ1.*Dzϕ1 .+ Dzψv1.*Dzψv1 .+ Dzψ1.*Dzψ1)
+        end
+
+        # sum the outgoing and ingoing norms to get the complete one
+        # characteristic
+        q_x_out     += dt0*dz*sum(ϕ2.*ϕ2 + ψv2.*ψv2 + Dzϕ2.*Dzϕ2, dims=2) # sol
+        q_x_max_out  = maximum(q_x_out) # sol
+        q_xmin_in   += dt0*dz*sum(ψ2[1,:].*ψ2[1,:]) # sol
+        q_xmin_out  += dt0*dz*sum(ϕ2[1,:].*ϕ2[1,:] + ψv2[1,:].*ψv2[1,:] +
+                                  Dzϕ2[1,:].*Dzϕ2[1,:]) # given
+        q_xmax_in   += dt0*dz*sum(ψ2[end,:].*ψ2[end,:]) # given
+        # cauchy
+        q_cauchy_ρmin_in  += dt0*dz*sum(ψ1[1,:].*ψ1[1,:]) # sol
+        q_cauchy_ρmax_out += dt0*dz*sum(ϕ1[end,:].*ϕ1[end,:] + ψv1[end,:].*ψv1[end,:] +
+                                        Dzϕ1[end,:].*Dzϕ1[end,:]) # sol
+        q_cauchy_ρmax_in  += dt0*dz*sum(ψ1[end,:].*ψ1[end,:]) # given
+        q_cauchy_ρmin_out += dt0*dz*sum(ϕ1[1,:].*ϕ1[1,:] + ψv1[1,:].*ψv1[1,:] +
+                                        Dzϕ1[1,:].*Dzϕ1[1,:]) # given
+        # characteristic
+        h1_x_out     += dt0*dz*sum(ϕ2.*ϕ2 + ψv2.*ψv2 +
+                                   Dxϕ2.*Dxϕ2 + Dxψv2.*Dxψv2 +
+                                   Dzϕ2.*Dzϕ2 + Dzψv2.*Dzψv2, dims=2) # sol
+        h1_x_max_out  = maximum(h1_x_out) # sol
+        h1_xmin_in   += dt0*dz*sum(ψ2[1,:].*ψ2[1,:] +
+                                   Dxψ2[1,:].*Dxψ2[1,:] +
+                                   Dzψ2[1,:].*Dzψ2[1,:]) # sol
+        h1_xmin_out  += dt0*dz*sum(ϕ2[1,:].*ϕ2[1,:] + ψv2[1,:].*ψv2[1,:] +
+                                   Dxϕ2[1,:].*Dxϕ2[1,:] + Dxψv2[1,:].*Dxψv2[1,:]+
+                                   Dzϕ2[1,:].*Dzϕ2[1,:] + Dzψv2[1,:].*Dzψv2[1,:]) # given
+        h1_xmax_in   += dt0*dz*sum(ψ2[end,:].*ψ2[end,:] +
+                                   Dxψ2[end,:].*Dxψ2[end,:] +
+                                   Dzψ2[end,:].*Dzψ2[end,:]) # given
+        # cauchy
+        h1_cauchy_ρmin_in  += dt0*dz*sum(ψ1[1,:].*ψ1[1,:] +
+                                         Dρψ1[1,:].*Dρψ1[1,:] +
+                                         Dzψ1[1,:].*Dzψ1[1,:]) # sol
+        h1_cauchy_ρmax_out += dt0*dz*sum(
+            ϕ1[end,:].*ϕ1[end,:] + ψv1[end,:].*ψv1[end,:] +
+            Dρϕ1[end,:].*Dρϕ1[end,:] + Dρψv1[end,:].*Dρψv1[end,:] +
+            Dzϕ1[end,:].*Dzϕ1[end,:] + Dzψv1[end,:].*Dzψv1[end,:]) # sol
+        h1_cauchy_ρmax_in  += dt0*dz*sum(ψ1[end,:].*ψ1[end,:] +
+                                         Dρψ1[end,:].*Dρψ1[end,:] +
+                                         Dzψ1[end,:].*Dzψ1[end,:]) # given
+        h1_cauchy_ρmin_out += dt0*dz*sum(
+            ϕ1[1,:].*ϕ1[1,:] + ψv1[1,:].*ψv1[1,:] +
+            Dρϕ1[1,:].*Dρϕ1[1,:] + Dρψv1[1,:].*Dρψv1[1,:] +
+            Dzϕ1[1,:].*Dzϕ1[1,:] + Dzψv1[1,:].*Dzψv1[1,:]) # given
+        
         # full norms
-        q_cauchy[it] = dρ*dz*sum(ϕ1.*ϕ1 .+ ψv1.*ψv1 .+ ψ1.*ψ1 .+ Dzϕ1.*Dzϕ1) +
-            dt0*dz*sum(ψ1[1,:].*ψ1[1,:]) +
-            dt0*dz*sum(ϕ1[end,:].*ϕ1[end,:] .+ ψv1[end,:].*ψv1[end,:] .+ Dzϕ1[end,:].*Dzϕ1[end,:])
+        q_cauchy_sol[it] = dρ*dz*sum(ϕ1.*ϕ1 .+ ψv1.*ψv1 .+ ψ1.*ψ1 .+ Dzϕ1.*Dzϕ1) +
+            q_cauchy_ρmin_in + q_cauchy_ρmax_out
 
-        q_char[it] = dx*dz*sum(ψ2.*ψ2) + maximum(q_out_x) +
-            dt0*dz*sum(ψ2[1,:].*ψ2[1,:])
+        q_char_sol[it] = dx*dz*sum(ψ2.*ψ2) + q_xmin_in + q_x_max_out
 
-        H1_cauchy[it] = 
-            dt0*dz*sum(ϕ1[end,:].*ϕ1[end,:] .+ ψv1[end,:].*ψv1[end,:] .+
-                       Dρϕ1[end,:].*Dρϕ1[end,:] .+ Dρψv1[end,:].*Dρψv1[end,:] .+
-                       Dzϕ2[end,:].*Dzϕ2[end,:] .+ Dzψv2[end,:].*Dzψv2[end,:]) +
-                       dρ*dz*sum(ϕ1.*ϕ1 .+ ψv1.*ψv1 .+ ψ1.*ψ1 .+
-                                 Dρϕ1.*Dρϕ1 .+ Dρψv1.*Dρψv1 .+ Dρψ1.*Dρψ1 .+
-                                 Dzϕ1.*Dzϕ1 .+ Dzψv1.*Dzψv1 .+ Dzψ1.*Dzψ1) +
-                                 dt0*dz*sum(ψ1[1,:].*ψ1[1,:] .+ Dρψ1[1,:].*Dρψ1[1,:] .+
-                                            Dzψ1[1,:].*Dzψ1[1,:])
+        H1_cauchy_sol[it] = dρ*dz*sum(
+            ϕ1.*ϕ1 .+ ψv1.*ψv1 .+ ψ1.*ψ1 .+
+            Dρϕ1.*Dρϕ1 .+ Dρψv1.*Dρψv1 .+ Dρψ1.*Dρψ1 .+
+            Dzϕ1.*Dzϕ1 .+ Dzψv1.*Dzψv1 .+ Dzψ1.*Dzψ1) +
+            h1_cauchy_ρmin_in + h1_cauchy_ρmax_out
 
+        H1_char_sol[it] = dx*dz*sum(ψ2.*ψ2 .+ Dxψ2.*Dxψ2 .+ Dzψ2.*Dzψ2) +
+            h1_xmin_in + h1_x_max_out
 
-        H1_char[it] = dx*dz*sum(ψ2.*ψ2 .+ Dxψ2.*Dxψ2 .+ Dzψ2.*Dzψ2) +
-            maximum(h1_out_x) +
-            dt0*dz*sum(ψ2[1,:].*ψ2[1,:] .+ Dxψ2[1,:].*Dxψ2[1,:] .+ Dzψ2[1,:].*Dzψ2[1,:])
+        # given data norms
+        q_cauchy_given[it]  = q_cauchy_t0 + q_cauchy_ρmin_out + q_cauchy_ρmax_in
+        q_char_given[it]    = q_char_u0 + q_xmin_out + q_xmax_in
+        H1_cauchy_given[it] = h1_cauchy_t0 + h1_cauchy_ρmin_out + h1_cauchy_ρmax_in
+        H1_char_given[it]   = h1_char_u0 + h1_xmin_out + h1_xmax_in
+            
     end
 
-    tt, q_cauchy, q_char, H1_cauchy, H1_char
+    tt, q_cauchy_sol, q_char_sol, H1_cauchy_sol, H1_char_sol, q_cauchy_given, q_char_given, H1_cauchy_given, H1_char_given
 
 end
 
@@ -199,8 +288,8 @@ Nmax = 4
 Nρ = 17
 Nz = 16
 
-root_dir  = "/home/thanasis/repos/model_CCE_CCM_public/examples/run_ibvp_cibvp/"
-toy_model = "SYMH_SYMH_noise_t20_H1_amp/"
+root_dir  = "/home/thanasis/repos/model_CCE_CCM_public/examples/run_cce/"
+toy_model = "SYMH_B1_WH_B2_noise_t20_H1_amp/"
 
 coarse_dir = joinpath(root_dir, toy_model, "data_$(Nρ)_$(Nz)")
 
@@ -217,15 +306,16 @@ for n in 0:1:Nmax
 
     dir = joinpath(root_dir, toy_model, "data_$((Nρ-1)*2^n + 1)_$((Nz)*2^n)")
     
-    tt, q_cauchy, q_char, H1_cauchy, H1_char = norms_t_func(dir, dt0)
+    
+    tt, q_cauchy_sol, q_char_sol, H1_cauchy_sol, H1_char_sol, q_cauchy_given, q_char_given, H1_cauchy_given, H1_char_given = norms_t_func(dir, dt0)
 
     data_dir2 = joinpath(root_dir, toy_model, "dev_norms_exact_cauchy_char")
     mkpath(data_dir2)
 
-    outfile  = joinpath(data_dir2, "L2_$(n).dat")
+    outfile  = joinpath(data_dir2, "norms_$(n).dat")
     open(outfile, "w") do io
-        println(io, "# tt | q_cauchy | q_char | H1_cauchy | H1_char")
-        writedlm(io, [tt q_cauchy q_char H1_cauchy H1_char])
+        println(io, "# tt | q_cauchy_sol | q_char_sol | H1_cauchy_sol | H1_char_sol | q_cauchy_given | q_char_given | H1_cauchy_given | H1_char_given")
+        writedlm(io, [tt q_cauchy_sol q_char_sol H1_cauchy_sol H1_char_sol q_cauchy_given q_char_given H1_cauchy_given H1_char_given])
     end
 
 end

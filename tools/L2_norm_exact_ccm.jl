@@ -62,24 +62,25 @@ function L2_t_func(dir, dt0)
     tt           = zeros(Nf)
 
     # full
-    L2_t2        = zeros(Nf)
-    #characteristic
-    l2_out       = zeros(Nf)
-    l2_out_x     = zeros(length(ρ))
-    l2_out_x_max = zeros(Nf)
-    l2_out_end   = zeros(Nf)
-    l2_in        = zeros(Nf)
-    #cauchy
-    l2_cauchy           = zeros(Nf)
-    l2_cauchy_in_1      = zeros(Nf)
-    l2_cauchy_in_ρ_max  = zeros(Nf)
+    # for solution
+    L2_sol          = zeros(Nf)
+    # for given data
+    L2_given        = zeros(Nf)
     
-    # temporary values for calculation
+    # temporary values for calculation of worldtube sums
+    # out stands for outgoing vars, in for ingoing vars
     # characteristic
-    l2_out_end_temp = 0.0
+    l2_x_out     = zeros(length(ρ)) # sum for outgoing vars over all x
+    l2_x_max_out = 0.0 # the max value of that sum, no necessarily xmax or xmin
+    l2_xmax_in   = 0.0 #given
+    
     #cauchy
-    l2_cauchy_in_1_temp = 0.0
-    l2_cauchy_in_ρ_temp = zeros(length(ρ))
+    l2_cauchy_ρmin_in  = 0.0 #sol
+    l2_cauchy_ρmin_out = 0.0 #given
+    
+    # Initial data
+    l2_char_u0   = 0.0
+    l2_cauchy_t0 = 0.0
     
     for it in ProgressBar(1:Nf)
         file = filenames[it]
@@ -98,22 +99,29 @@ function L2_t_func(dir, dt0)
         # time
         tt[it]  = t
 
+        if i==1
+            println("computing initial data norm")
+            l2_char_u0   = dx*dz*sum(ψ2.*ψ2)
+            l2_cauchy_t0 = dρ*dz*sum(ϕ1.*ϕ1 + ψv1.*ψv1 + ψ1.*ψ1)
+        end
+        
         # sum the outgoing and ingoing norms to get the complete one
         # characteristic
-        l2_in[it]           = dx*dz*sum(ψ2.*ψ2)
-        l2_out_x           += dt0*dz*sum(ϕ2.*ϕ2 + ψv2.*ψv2, dims=2)
-        l2_out_x_max[it]    = maximum(l2_out_x)
-        #cauchy
-        l2_cauchy[it]            = dρ*dz*sum(ϕ1.*ϕ1 + ψv1.*ψv1 + ψ1.*ψ1)
-        l2_cauchy_in_1_temp     += dt0*dz*sum(ψ1[1,:].*ψ1[1,:])
-        l2_cauchy_in_1[it]       = l2_cauchy_in_1_temp
+        l2_x_out     += dt0*dz*sum(ϕ2.*ϕ2 + ψv2.*ψv2, dims=2) # sol
+        l2_x_max_out  = maximum(l2_x_out) # sol
+        l2_xmax_in   += dt0*dz*sum(ψ2[end,:].*ψ2[end,:]) # given
+        # cauchy
+        l2_cauchy_ρmin_in  += dt0*dz*sum(ψ1[1,:].*ψ1[1,:]) # sol
+        l2_cauchy_ρmin_out += dt0*dz*sum(ϕ1[1,:].*ϕ1[1,:] + ψv1[1,:].*ψv1[1,:]) # given
         
         # full norms
-        L2_t2[it] = l2_in[it] + l2_out_x_max[it] + l2_cauchy[it] + l2_cauchy_in_1[it]
+        L2_sol[it]   = dρ*dz*sum(ϕ1.*ϕ1 + ψv1.*ψv1 + ψ1.*ψ1) +
+            dx*dz*sum(ψ2.*ψ2) + l2_x_max_out + l2_cauchy_ρmin_in
+        L2_given[it] = l2_cauchy_t0 + l2_char_u0 + l2_cauchy_ρmin_out + l2_xmax_in
         
     end
 
-    tt, l2_in, l2_out_x_max, l2_cauchy, l2_cauchy_in_1, L2_t2
+    tt, L2_sol, L2_given
     
 end
 
@@ -142,15 +150,15 @@ for n in 0:1:Nmax
 
     dir = joinpath(root_dir, toy_model, "data_$((Nρ-1)*2^n + 1)_$((Nz)*2^n)")
     
-    tt, l2_in, l2_out_x_max, l2_cauchy, l2_cauchy_in_1, L2_t2 = L2_t_func(dir, dt0)
+    tt, L2_sol, L2_given = L2_t_func(dir, dt0)
 
     data_dir2 = joinpath(root_dir, toy_model, "norms_exact")
     mkpath(data_dir2)
 
     outfile  = joinpath(data_dir2, "L2_$(n).dat")
     open(outfile, "w") do io
-        println(io, "#tt | l2_in | l2_out_x_max | l2_cauchy | l2_cauchy_in_1 | L2_t2")
-        writedlm(io, [tt l2_in l2_out_x_max l2_cauchy l2_cauchy_in_1 L2_t2])
+        println(io, "#tt | L2_sol | L2_given")
+        writedlm(io, [tt L2_sol L2_given])
     end
 
 end

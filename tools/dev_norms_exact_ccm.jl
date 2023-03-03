@@ -109,12 +109,34 @@ function dev_t_func(dir, dt0)
     tt           = zeros(Nf)
 
     # full
-    q  = zeros(Nf)
-    H1 = zeros(Nf)
+    # for solution
+    q_sol          = zeros(Nf)
+    H1_sol         = zeros(Nf)
+    # for given data
+    q_given        = zeros(Nf)
+    H1_given       = zeros(Nf)
     
-    # initiate the grid function for the outgoing norm
-    q_out_x = zeros(length(x))
-    h1_out_x = zeros(length(x))
+    # temporary values for calculation of worldtube sums
+    # out stands for outgoing vars, in for ingoing vars
+    # characteristic
+    q_x_out      = zeros(length(ρ)) # sum for outgoing vars over all x
+    q_x_max_out  = 0.0 # the max value of that sum, no necessarily xmax or xmin
+    q_xmax_in    = 0.0 #given
+    h1_x_out     = zeros(length(ρ)) # sum for outgoing vars over all x
+    h1_x_max_out = 0.0 # the max value of that sum, no necessarily xmax or xmin
+    h1_xmax_in   = 0.0 #given
+    
+    #cauchy
+    q_cauchy_ρmin_in   = 0.0 #sol
+    q_cauchy_ρmin_out  = 0.0 #given
+    h1_cauchy_ρmin_in  = 0.0 #sol
+    h1_cauchy_ρmin_out = 0.0 #given
+    
+    # Initial data
+    q_char_u0    = 0.0
+    q_cauchy_t0  = 0.0
+    h1_char_u0   = 0.0
+    h1_cauchy_t0 = 0.0
 
     for it in ProgressBar(1:Nf)
         file = filenames[it]
@@ -147,33 +169,61 @@ function dev_t_func(dir, dt0)
 
         # time
         t  = h5readattr(file, "/")["time"]
-        
+
         # time saved
         tt[it]  = t
 
-        # get the characteristi outgoing part of the norm
-        q_out_x += dt0*dz*sum( ψv2.*ψv2 .+ ϕ2.*ϕ2 .+ Dzϕ2.*Dzϕ2, dims=2)
-        h1_out_x += dt0*dz*sum( ψv2.*ψv2 .+ ϕ2.*ϕ2 .+
-                                Dxψv2.*Dxψv2 .+ Dxϕ2.*Dxϕ2 .+
-                                Dzψv2.*Dzψv2 .+ Dzϕ2.*Dzϕ2, dims=2)
+        if i==1
+            println("computing initial data norm")
+            q_char_u0    = dx*dz*sum(ψ2.*ψ2)
+            q_cauchy_t0  = dρ*dz*sum(ϕ1.*ϕ1 + ψv1.*ψv1 + ψ1.*ψ1 + Dzϕ1.*Dzϕ1)
+            h1_char_u0   = dx*dz*sum(ψ2.*ψ2 + Dxψ2.*Dxψ2 + Dzψ2.*Dzψ2)
+            h1_cauchy_t0 = dρ*dz*sum(
+                ϕ1.*ϕ1 + ψv1.*ψv1 + ψ1.*ψ1 +
+                Dρϕ1.*Dρϕ1 + Dρψv1.*Dρψv1 + Dρψ1.*Dρψ1 +
+                Dzϕ1.*Dzϕ1 + Dzψv1.*Dzψv1 + Dzψ1.*Dzψ1)
+        end
+       
+        # sum the outgoing and ingoing norms to get the complete one
+        # characteristic
+        q_x_out      += dt0*dz*sum(ϕ2.*ϕ2 + ψv2.*ψv2 + Dzϕ2.*Dzϕ2, dims=2) # sol
+        q_x_max_out   = maximum(q_x_out) # sol
+        q_xmax_in    += dt0*dz*sum(ψ2[end,:].*ψ2[end,:]) # given
+        h1_x_out     += dt0*dz*sum(ϕ2.*ϕ2 + ψv2.*ψv2 +
+                                   Dxϕ2.*Dxϕ2 + Dxψv2.*Dxψv2 +
+                                   Dzϕ2.*Dzϕ2 + Dzψv2.*Dzψv2, dims=2) # sol
+        h1_x_max_out  = maximum(h1_x_out) # sol
+        h1_xmax_in   += dt0*dz*sum(ψ2[end,:].*ψ2[end,:] +
+                                   Dxψ2[end,:].*Dxψ2[end,:] +
+                                   Dzψ2[end,:].*Dzψ2[end,:]) # given
+        # cauchy
+        q_cauchy_ρmin_in   += dt0*dz*sum(ψ1[1,:].*ψ1[1,:]) # sol
+        q_cauchy_ρmin_out  += dt0*dz*sum(ϕ1[1,:].*ϕ1[1,:] + ψv1[1,:].*ψv1[1,:] +
+                                         Dzϕ1[1,:].*Dzϕ1[1,:]) # given
+        h1_cauchy_ρmin_in  += dt0*dz*sum(ψ1[1,:].*ψ1[1,:] +
+                                         Dρψ1[1,:].*Dρψ1[1,:] +
+                                         Dzψ1[1,:].*Dzψ1[1,:]) # sol
+        h1_cauchy_ρmin_out += dt0*dz*sum(
+            ϕ1[1,:].*ϕ1[1,:] + ψv1[1,:].*ψv1[1,:] +
+            Dρϕ1[1,:].*Dρϕ1[1,:] + Dρψv1[1,:].*Dρψv1[1,:] +
+            Dzϕ1[1,:].*Dzϕ1[1,:] + Dzψv1[1,:].*Dzψv1[1,:]) # given
         
+        # full norms
+        q_sol[it]   = dρ*dz*sum(ϕ1.*ϕ1 + ψv1.*ψv1 + ψ1.*ψ1 + Dzϕ1.*Dzϕ1) +
+            dx*dz*sum(ψ2.*ψ2) + q_x_max_out + q_cauchy_ρmin_in
+        q_given[it] = q_cauchy_t0 + q_char_u0 + q_cauchy_ρmin_out + q_xmax_in
 
-        # q norm
-        q[it] = dx*dz*sum(ψ2.*ψ2) + maximum(q_out_x) +
-            dρ*dz*sum(ϕ1.*ϕ1 .+ ψv1.*ψv1 .+ ψ1.*ψ1) +
-            dt0*dz*sum(ψ1[1,:].*ψ1[1,:])
+        H1_sol[it]   = dρ*dz*sum(
+            ϕ1.*ϕ1 + ψv1.*ψv1 + ψ1.*ψ1 +
+            Dρϕ1.*Dρϕ1 + Dρψv1.*Dρψv1 + Dρψ1.*Dρψ1 +
+            Dzϕ1.*Dzϕ1 + Dzψv1.*Dzψv1 + Dzψ1.*Dzψ1) +
+            dx*dz*sum(ψ2.*ψ2 + Dxψ2.*Dxψ2 + Dzψ2.*Dzψ2) +
+            h1_x_max_out + h1_cauchy_ρmin_in
+        H1_given[it] = h1_cauchy_t0 + h1_char_u0 + h1_cauchy_ρmin_out + h1_xmax_in
 
-        # H1 norm
-        H1[it] = dx*dz*sum(ψ2.*ψ2 .+ Dxψ2.*Dxψ2 .+ Dzψ2.*Dzψ2) +
-            maximum(h1_out_x) +
-            dρ*dz*sum(ϕ1.*ϕ1 .+ ψv1.*ψv1 .+ ψ1.*ψ1 .+
-                      Dρϕ1.*Dρϕ1 .+ Dρψv1.*Dρψv1 .+ Dρψ1.*Dρψ1 .+
-                      Dzϕ1.*Dzϕ1 .+ Dzψv1.*Dzψv1 .+ Dzψ1.*Dzψ1) +
-                      dt0*dz*sum(ψ1[1,:].*ψ1[1,:] .+ Dρψ1[1,:].*Dρψ1[1,:] .+
-                                 Dzψ1[1,:].*Dzψ1[1,:])
     end
 
-    tt, q, H1
+    tt, q_sol, H1_sol, q_given, H1_given
     
 end
 
@@ -184,8 +234,8 @@ Nmax = 4
 Nρ = 17
 Nz = 16
 
-root_dir  = "/home/pmzag1/repos/model_CCE_CCM_public/examples/run_ccm/"
-toy_model = "WH_WH_noise_t20_H1_amp/"
+root_dir  = "/home/thanasis/repos/model_CCE_CCM_public/examples/run_ccm/"
+toy_model = "WH_B1_WH_B2_noise_t20_H1_amp/"
 
 coarse_dir = joinpath(root_dir, toy_model, "data_$(Nρ)_$(Nz)")
 
