@@ -219,10 +219,10 @@ function norms_t_func(dir, dt0)
                                    Dxψ2[1,:].*Dxψ2[1,:] +
                                    Dzψ2[1,:].*Dzψ2[1,:]) # sol
         h1_xmin_out  += dt0*dz*sum(ϕ2[1,:].*ϕ2[1,:] + ψv2[1,:].*ψv2[1,:] +
-                                   Dxϕ2[1,:].*Dxϕ2[1,:] + Dxψv2[1,:].*Dxψv2[1,:]+
+                                   #Dxϕ2[1,:].*Dxϕ2[1,:] + Dxψv2[1,:].*Dxψv2[1,:]+ # involves part of sol to find it; not controlled
                                    Dzϕ2[1,:].*Dzϕ2[1,:] + Dzψv2[1,:].*Dzψv2[1,:]) # given
         h1_xmax_in   += dt0*dz*sum(ψ2[end,:].*ψ2[end,:] +
-                                   Dxψ2[end,:].*Dxψ2[end,:] +
+                                   #Dxψ2[end,:].*Dxψ2[end,:] + # involves part of sol to find it; not controlled
                                    Dzψ2[end,:].*Dzψ2[end,:]) # given
         # cauchy
         h1_cauchy_ρmin_in  += dt0*dz*sum(ψ1[1,:].*ψ1[1,:] +
@@ -233,13 +233,13 @@ function norms_t_func(dir, dt0)
             Dρϕ1[end,:].*Dρϕ1[end,:] + Dρψv1[end,:].*Dρψv1[end,:] +
             Dzϕ1[end,:].*Dzϕ1[end,:] + Dzψv1[end,:].*Dzψv1[end,:]) # sol
         h1_cauchy_ρmax_in  += dt0*dz*sum(ψ1[end,:].*ψ1[end,:] +
-                                         Dρψ1[end,:].*Dρψ1[end,:] +
+                                         #Dρψ1[end,:].*Dρψ1[end,:] + # involves part of sol to find it; not controlled
                                          Dzψ1[end,:].*Dzψ1[end,:]) # given
         h1_cauchy_ρmin_out += dt0*dz*sum(
             ϕ1[1,:].*ϕ1[1,:] + ψv1[1,:].*ψv1[1,:] +
-            Dρϕ1[1,:].*Dρϕ1[1,:] + Dρψv1[1,:].*Dρψv1[1,:] +
+            #Dρϕ1[1,:].*Dρϕ1[1,:] + Dρψv1[1,:].*Dρψv1[1,:] + # involves part of sol to find it; not controlled
             Dzϕ1[1,:].*Dzϕ1[1,:] + Dzψv1[1,:].*Dzψv1[1,:]) # given
-        
+
         # full norms
         q_cauchy_sol[it] = dρ*dz*sum(ϕ1.*ϕ1 .+ ψv1.*ψv1 .+ ψ1.*ψ1 .+ Dzϕ1.*Dzϕ1) +
             q_cauchy_ρmin_in + q_cauchy_ρmax_out
@@ -274,8 +274,8 @@ Nmax = 4
 Nρ = 17
 Nz = 16
 
-root_dir  = "/home/pmzag1/repos/model_CCE_CCM_public/examples/run_ibvp_cibvp/"
-toy_model = "SYMH_SYMH_noise_t20_H1_amp/"
+root_dir  = "/home/pmzag1/repos/model_CCE_CCM_public/examples/run_cce/"
+toy_model = "SYMH_WH_noise_t20_q_amp/"
 
 coarse_dir = joinpath(root_dir, toy_model, "data_$(Nρ)_$(Nz)")
 
