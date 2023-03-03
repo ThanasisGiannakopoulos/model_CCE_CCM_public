@@ -99,8 +99,7 @@ function L2_t_func(dir, dt0)
         # time
         tt[it]  = t
 
-        if i==1
-            println("computing initial data norm")
+        if it==1
             l2_char_u0   = dx*dz*sum(ψ2.*ψ2)
             l2_cauchy_t0 = dρ*dz*sum(ϕ1.*ϕ1 + ψv1.*ψv1 + ψ1.*ψ1)
         end
@@ -133,7 +132,7 @@ Nρ = 17
 Nz = 16
 
 root_dir  = "/home/pmzag1/repos/model_CCE_CCM_public/examples/run_ccm/"
-toy_model = "WH_WH_noise_t20_L2_amp/"
+toy_model = "SYMH_SYMH_noise_t20_L2_amp/"
 
 coarse_dir = joinpath(root_dir, toy_model, "data_$(Nρ)_$(Nz)")
 

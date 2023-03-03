@@ -109,19 +109,47 @@ function norms_t_func(dir, dt0)
     tt           = zeros(Nf)
 
     # full
-    q_cauchy         = zeros(Nf)
-    q_char           = zeros(Nf)
-    H1_cauchy        = zeros(Nf)
-    H1_char          = zeros(Nf)
-    L2_Sigma_t_sum   = zeros(Nf)
-    Dzϕ1_Sigma_t_sum   = zeros(Nf)
-    ψ1_T_min_sum       = zeros(Nf)
-    L2_out_T_max_sum   = zeros(Nf)
-    Dzϕ1_T_max_sum     = zeros(Nf)
+    # for solution
+    q_cauchy_sol     = zeros(Nf)
+    q_char_sol       = zeros(Nf)
+    H1_cauchy_sol    = zeros(Nf)
+    H1_char_sol      = zeros(Nf)
+    # for given data
+    q_cauchy_given   = zeros(Nf)
+    q_char_given     = zeros(Nf)
+    H1_cauchy_given  = zeros(Nf)
+    H1_char_given    = zeros(Nf)
+
+    # temporary values for calculation of worldtube sums
+    # out stands for outgoing vars, in for ingoing vars
+    # characteristic
+    q_x_out       = zeros(length(ρ)) # sum for outgoing vars over all x
+    q_x_max_out   = 0.0 # the max value of that sum, no necessarily xmax or xmin
+    h1_x_out      = zeros(length(ρ)) # sum for outgoing vars over all x
+    h1_x_max_out  = 0.0 # the max value of that sum
+    q_xmin_out    = 0.0
+    q_xmin_in     = 0.0
+    q_xmax_in     = 0.0
+    h1_xmin_in    = 0.0
+    h1_xmin_out   = 0.0
+    h1_xmax_out   = 0.0
+    h1_xmax_in    = 0.0
     
-    # initiate the grid function for the outgoing norm
-    q_out_x = zeros(length(x))
-    h1_out_x = zeros(length(x))
+    #cauchy
+    q_cauchy_ρmin_in   = 0.0
+    q_cauchy_ρmin_out  = 0.0
+    q_cauchy_ρmax_in   = 0.0
+    q_cauchy_ρmax_out  = 0.0
+    h1_cauchy_ρmin_in  = 0.0
+    h1_cauchy_ρmin_out = 0.0
+    h1_cauchy_ρmax_in  = 0.0
+    h1_cauchy_ρmax_out = 0.0
+
+    # Initial data
+    q_char_u0   = 0.0
+    q_cauchy_t0 = 0.0
+    h1_char_u0   = 0.0
+    h1_cauchy_t0 = 0.0
     
     for it in ProgressBar(1:Nf)
         file = filenames[it]
@@ -156,51 +184,9 @@ function norms_t_func(dir, dt0)
         t  = h5readattr(file, "/")["time"]
         
         # time
-        tt[it]  = t
+        tt[it]  = t        
 
-        
-        # full
-        # for solution
-        q_cauchy_sol     = zeros(Nf)
-        q_char_sol       = zeros(Nf)
-        h1_cauchy_sol    = zeros(Nf)
-        h1_char_sol      = zeros(Nf)
-        # for given data
-        q_cauchy_given   = zeros(Nf)
-        q_char_given     = zeros(Nf)
-        h1_cauchy_given  = zeros(Nf)
-        h1_char_given    = zeros(Nf)
-
-        # temporary values for calculation of worldtube sums
-        # out stands for outgoing vars, in for ingoing vars
-        # characteristic
-        q_x_out     = zeros(length(ρ)) # sum for outgoing vars over all x
-        q_x_max_out = 0.0 # the max value of that sum, no necessarily xmax or xmin
-        h1_x_out     = zeros(length(ρ)) # sum for outgoing vars over all x
-        h1_x_max_out = 0.0 # the max value of that sum
-        q_xmin_out  = 0.0
-        q_xmax_in   = 0.0
-        h1_xmin_out  = 0.0
-        h1_xmax_in   = 0.0
-        
-        #cauchy
-        q_cauchy_ρmin_in  = 0.0
-        q_cauchy_ρmin_out = 0.0
-        q_cauchy_ρmax_in  = 0.0
-        q_cauchy_ρmax_out = 0.0
-        h1_cauchy_ρmin_in  = 0.0
-        h1_cauchy_ρmin_out = 0.0
-        h1_cauchy_ρmax_in  = 0.0
-        h1_cauchy_ρmax_out = 0.0
-
-        # Initial data
-        q_char_u0   = 0.0
-        q_cauchy_t0 = 0.0
-        h1_char_u0   = 0.0
-        h1_cauchy_t0 = 0.0
-
-        if i==1
-            println("computing initial data norm")
+        if it==1
             q_char_u0    = dx*dz*sum(ψ2.*ψ2)
             q_cauchy_t0  = dρ*dz*sum(ϕ1.*ϕ1 .+ ψv1.*ψv1 .+ ψ1.*ψ1 .+ Dzϕ1.*Dzϕ1)
             h1_char_u0   = dx*dz*sum(ψ2.*ψ2 .+ Dxψ2.*Dxψ2 .+ Dzψ2.*Dzψ2)
@@ -288,8 +274,8 @@ Nmax = 4
 Nρ = 17
 Nz = 16
 
-root_dir  = "/home/thanasis/repos/model_CCE_CCM_public/examples/run_cce/"
-toy_model = "SYMH_B1_WH_B2_noise_t20_H1_amp/"
+root_dir  = "/home/pmzag1/repos/model_CCE_CCM_public/examples/run_ibvp_cibvp/"
+toy_model = "SYMH_SYMH_noise_t20_H1_amp/"
 
 coarse_dir = joinpath(root_dir, toy_model, "data_$(Nρ)_$(Nz)")
 

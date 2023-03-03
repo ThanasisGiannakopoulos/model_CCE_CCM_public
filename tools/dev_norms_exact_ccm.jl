@@ -173,7 +173,7 @@ function dev_t_func(dir, dt0)
         # time saved
         tt[it]  = t
 
-        if i==1
+        if it==1
             println("computing initial data norm")
             q_char_u0    = dx*dz*sum(ψ2.*ψ2)
             q_cauchy_t0  = dρ*dz*sum(ϕ1.*ϕ1 + ψv1.*ψv1 + ψ1.*ψ1 + Dzϕ1.*Dzϕ1)
@@ -234,8 +234,8 @@ Nmax = 4
 Nρ = 17
 Nz = 16
 
-root_dir  = "/home/thanasis/repos/model_CCE_CCM_public/examples/run_ccm/"
-toy_model = "WH_B1_WH_B2_noise_t20_H1_amp/"
+root_dir  = "/home/pmzag1/repos/model_CCE_CCM_public/examples/run_ccm/"
+toy_model = "WH_WH_noise_t20_q_amp/"
 
 coarse_dir = joinpath(root_dir, toy_model, "data_$(Nρ)_$(Nz)")
 
