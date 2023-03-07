@@ -174,7 +174,6 @@ function dev_t_func(dir, dt0)
         tt[it]  = t
 
         if it==1
-            println("computing initial data norm")
             q_char_u0    = dx*dz*sum(ψ2.*ψ2)
             q_cauchy_t0  = dρ*dz*sum(ϕ1.*ϕ1 + ψv1.*ψv1 + ψ1.*ψ1 + Dzϕ1.*Dzϕ1)
             h1_char_u0   = dx*dz*sum(ψ2.*ψ2 + Dxψ2.*Dxψ2 + Dzψ2.*Dzψ2)
@@ -194,7 +193,7 @@ function dev_t_func(dir, dt0)
                                    Dzϕ2.*Dzϕ2 + Dzψv2.*Dzψv2, dims=2) # sol
         h1_x_max_out  = maximum(h1_x_out) # sol
         h1_xmax_in   += dt0*dz*sum(ψ2[end,:].*ψ2[end,:] +
-                                   Dxψ2[end,:].*Dxψ2[end,:] +
+                                   #Dxψ2[end,:].*Dxψ2[end,:] +
                                    Dzψ2[end,:].*Dzψ2[end,:]) # given
         # cauchy
         q_cauchy_ρmin_in   += dt0*dz*sum(ψ1[1,:].*ψ1[1,:]) # sol
@@ -205,7 +204,7 @@ function dev_t_func(dir, dt0)
                                          Dzψ1[1,:].*Dzψ1[1,:]) # sol
         h1_cauchy_ρmin_out += dt0*dz*sum(
             ϕ1[1,:].*ϕ1[1,:] + ψv1[1,:].*ψv1[1,:] +
-            Dρϕ1[1,:].*Dρϕ1[1,:] + Dρψv1[1,:].*Dρψv1[1,:] +
+            #Dρϕ1[1,:].*Dρϕ1[1,:] + Dρψv1[1,:].*Dρψv1[1,:] +
             Dzϕ1[1,:].*Dzϕ1[1,:] + Dzψv1[1,:].*Dzψv1[1,:]) # given
         
         # full norms
@@ -234,8 +233,8 @@ Nmax = 4
 Nρ = 17
 Nz = 16
 
-root_dir  = "/home/pmzag1/repos/model_CCE_CCM_public/examples/run_ccm/"
-toy_model = "WH_WH_noise_t20_q_amp/"
+root_dir  = "/home/thanasis/repos/model_CCE_CCM_public/examples/run_ccm/"
+toy_model = "SYMH_B1_SYMH_B2_noise_t20_H1_amp/"
 
 coarse_dir = joinpath(root_dir, toy_model, "data_$(Nρ)_$(Nz)")
 
@@ -252,15 +251,15 @@ for n in 0:1:Nmax
 
     dir = joinpath(root_dir, toy_model, "data_$((Nρ-1)*2^n + 1)_$((Nz)*2^n)")
     
-    tt, q, H1 = dev_t_func(dir, dt0)
+    tt, q_sol, H1_sol, q_given, H1_given = dev_t_func(dir, dt0)
     
     data_dir2 = joinpath(root_dir, toy_model, "dev_norms_exact")
     mkpath(data_dir2)
 
     outfile  = joinpath(data_dir2, "dev_norms_$(n).dat")
     open(outfile, "w") do io
-        println(io, "# tt | q | H1 ")
-        writedlm(io, [tt q H1])
+        println(io, "#tt | q_sol | H1_sol | q_given | H1_given")
+        writedlm(io, [tt q_sol H1_sol q_given H1_given])
     end
 
 end
