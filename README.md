@@ -75,7 +75,8 @@ parameter "D" in the script. There are more parameters in the script
 that control e.g. the degree of hyperbolicity of the IBVP and CIBVP,
 their source terms etc. See "./examples/REAME.md" for more details, as
 well as the comments within the script.
-+ The norms (L2, q, and H1) are calculated with the Julia scripts in
+
+The norms (L2, q, and H1) are calculated with the Julia scripts in
 "./tools" and plotted with the Jupyter notebooks in the same
 directory. For example, to reproduce Fig.8-10, you first need to run
 the noisy CCM script for SYMH-SYMH, WH-WH, SYMH-WH, and SYMH B1-WH B2,
