@@ -40,14 +40,14 @@ following cases are explored:
 + inhomogeneous with only non-vanishing $b_{32}=1$
 
 The code is written in the [Julia programming
-languange](https://julialang.org/) as a package (not registered), and
+languange](https://julialang.org/) as a module, and
 tested in Julia version 1.8.5.
 
 ## Installation
 
 After you have installed Julia and downloaded the repository
 "model_CCE_CCM_public", change to your local directory where the
-repository is saved. The package can be installed using Julia's REPL
+repository is saved. The module can be installed using Julia's REPL
 mode. To enter Julia's REPL open your terminal and run "julia". Then
 do:
 
@@ -75,15 +75,16 @@ parameter "D" in the script. There are more parameters in the script
 that control e.g. the degree of hyperbolicity of the IBVP and CIBVP,
 their source terms etc. See "./examples/REAME.md" for more details, as
 well as the comments within the script.
-+ The norms (L2, q, and H1) are calculated with the Julia scripts in
+
+The norms (L2, q, and H1) are calculated with the Julia scripts in
 "./tools" and plotted with the Jupyter notebooks in the same
 directory. For example, to reproduce Fig.8-10, you first need to run
 the noisy CCM script for SYMH-SYMH, WH-WH, SYMH-WH, and SYMH B1-WH B2,
 for resolutions D=0,1,2,3,4 for each case. Then, you need to run
 scripts "./tools/L2_norm_exact_ccm.jl" and "dev_norms_exact_ccm.jl",
-ones for each case (you need to appropriately change the path that
+one time for each case (you need to appropriately change the path that
 points to each directory with the relevant data, in each of the two
 scripts). Then, you can produce the figures by running the Jupyter
-notebook "./tools/tests_1234_noise_ccm.ipynb", where you have to again
-change the paths to point to the directories where the norms are
+notebook "./tools/tests_1234_noise_ccm.ipynb", where you have to
+change again the paths to point to the directories where the norms are
 saved. See "./tools/README.md" for more details.
