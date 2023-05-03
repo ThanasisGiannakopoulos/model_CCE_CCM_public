@@ -199,6 +199,7 @@ end
 """
 trapezoidal rule to solve the explicitly solve the instrinsic
 equations of the CIBVP
+https://en.wikipedia.org/wiki/Trapezoidal_rule_(differential_equations)
 """
 
 # mutates vf
