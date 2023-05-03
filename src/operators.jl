@@ -94,3 +94,88 @@ function Dρ(f, sys::System)
     f_ρ = similar(f)
     Dρ!(f_ρ, f, sys)
 end
+
+
+
+# left movers
+function DX_left_mov!(f_X::Matrix, f::Matrix, sys::System)
+    NX, Nz = size(f)
+    odX2 = 0.5 / sys.hX
+
+    @inbounds for j in 1:Nz
+        @inbounds for i in 1:NX-2
+            f_X[i,j] = (-3.0* f[i,j] + 4.0*f[i+1,j] - f[i+2,j]) * odX2
+        end
+    end
+
+    @inbounds for j in 1:Nz
+        # for time evol this is effectively overwritten by BD; relevant for norms
+        f_X[end,j] = (3.0* f[end,j] - 4.0*f[end-1,j] + f[end-2,j]) * odX2
+        #(-3.0* f[end,j] + 4.0*f[2,j] - f[3,j]) * odX2
+        f_X[end-1,j] = (-f[end-1,j] + f[end,j]) / sys.hX # 1st order accurate
+        #(3.0* f[end-1,j] - 4.0*f[end-2,j] + f[end-3,j]) * odX2
+        #-3.0* f[end-1,j] + 4.0*f[end,j] - f[2,j]) * odX2
+    end
+    
+    f_X
+end
+function DX_left_mov(f, sys::System)
+    f_X = similar(f)
+    DX_left_mov!(f_X, f, sys)
+end
+
+# right movers
+function Dρ_right_mov!(f_ρ::Matrix, f::Matrix, sys::System)
+    Nρ, Nz = size(f)
+    odρ2 = 0.5 / sys.hρ
+
+    @inbounds for j in 1:Nz
+        @inbounds for i in 3:Nρ
+            f_ρ[i,j] = ( 3.0* f[i,j] - 4.0*f[i-1,j] + f[i-2,j]) * odρ2
+            #(f[i+1,j] - f[i-1,j]) * odρ2
+        end
+    end
+
+    @inbounds for j in 1:Nz
+        # for time evol this is effectively overwritten by BD; relevant for norms
+        f_ρ[1,j] = (-3.0* f[1,j] + 4.0*f[2,j] - f[3,j]) * odρ2
+        #(3.0* f[1,j] - 4.0*f[end-1,j] + *f[end-2,j]) * odρ2
+        f_ρ[2,j] = (-f[1,j] + f[2,j]) / sys.hρ
+        #(-3.0* f[2,j] + 4.0*f[3,j] - f[4,j]) * odρ2
+        #(3.0* f[2,j] - 4.0*f[1,j] + f[end-1,j]) * odρ2 
+    end
+    
+    f_ρ
+end
+function Dρ_right_mov(f, sys::System)
+    f_ρ = similar(f)
+    Dρ_right_mov!(f_ρ, f, sys)
+end
+# left movers
+function Dρ_left_mov!(f_ρ::Matrix, f::Matrix, sys::System)
+    Nρ, Nz = size(f)
+    odρ2 = 0.5 / sys.hρ
+
+    @inbounds for j in 1:Nz
+        @inbounds for i in 1:Nρ-2
+            f_ρ[i,j] = (-3.0* f[i,j] + 4.0*f[i+1,j] - f[i+2,j]) * odρ2
+        end
+    end
+
+
+    ## Test the original version that is all 2nd order accurate
+    @inbounds for j in 1:Nz
+        # for time evol this is effectively overwritten by BD; relevant for norms
+        f_ρ[end,j] = (3.0* f[end,j] - 4.0*f[end-1,j] + f[end-2,j]) * odρ2
+        #(-3.0* f[end,j] + 4.0*f[2,j] - f[3,j]) * odρ2
+        f_ρ[end-1,j] = (-f[end-1,j] + f[end,j]) / sys.hρ # 1st order accurate
+        #(3.0* f[end-1,j] - 4.0*f[end-2,j] + f[end-3,j]) * odρ2
+        #-3.0* f[end-1,j] + 4.0*f[end,j] - f[2,j]) * odρ2
+    end
+    
+    f_ρ
+end
+function Dρ_left_mov(f, sys::System)
+    f_ρ= similar(f)
+    Dρ_left_mov!(f_ρ, f, sys)
+end
