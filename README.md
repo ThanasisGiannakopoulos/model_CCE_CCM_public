@@ -82,9 +82,9 @@ directory. For example, to reproduce Fig.8-10, you first need to run
 the noisy CCM script for SYMH-SYMH, WH-WH, SYMH-WH, and SYMH B1-WH B2,
 for resolutions D=0,1,2,3,4 for each case. Then, you need to run
 scripts "./tools/L2_norm_exact_ccm.jl" and "dev_norms_exact_ccm.jl",
-ones for each case (you need to appropriately change the path that
+one time for each case (you need to appropriately change the path that
 points to each directory with the relevant data, in each of the two
 scripts). Then, you can produce the figures by running the Jupyter
-notebook "./tools/tests_1234_noise_ccm.ipynb", where you have to again
-change the paths to point to the directories where the norms are
+notebook "./tools/tests_1234_noise_ccm.ipynb", where you have to change again
+the paths to point to the directories where the norms are
 saved. See "./tools/README.md" for more details.
