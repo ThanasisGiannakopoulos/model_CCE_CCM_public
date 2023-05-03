@@ -40,14 +40,14 @@ following cases are explored:
 + inhomogeneous with only non-vanishing $b_{32}=1$
 
 The code is written in the [Julia programming
-languange](https://julialang.org/) as a package (not registered), and
+languange](https://julialang.org/) as a module, and
 tested in Julia version 1.8.5.
 
 ## Installation
 
 After you have installed Julia and downloaded the repository
 "model_CCE_CCM_public", change to your local directory where the
-repository is saved. The package can be installed using Julia's REPL
+repository is saved. The module can be installed using Julia's REPL
 mode. To enter Julia's REPL open your terminal and run "julia". Then
 do:
 
