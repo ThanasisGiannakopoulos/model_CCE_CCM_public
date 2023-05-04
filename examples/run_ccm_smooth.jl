@@ -106,6 +106,10 @@ model_CCE_CCM.ψ2_BD(t::T, z::T, cibvp::smooth_cibvp) where {T<:Real} =
 #0.0
 # the right-moving BD for the CIBVP is given by the solution to the IBVP
 
+########
+# PLAY #
+########
+
 # change the name according to the setup you are solving (models + given data)
 toy_model = "SYMH_B1_WH_B2_smooth_t20" 
 root_dir="./run_ccm/"

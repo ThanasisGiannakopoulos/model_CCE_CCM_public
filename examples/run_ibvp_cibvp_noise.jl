@@ -91,6 +91,11 @@ model_CCE_CCM.ψv2_BD(t::T, z::T, cibvp::noise_cibvp) where {T<:Real} =
 model_CCE_CCM.ψ2_BD(t::T, z::T, cibvp::noise_cibvp) where {T<:Real} =
     cibvp.noise_amp_ψ2 * randn(T)
 
+########
+# PLAY #
+########
+
+# change the name according to the setup you are solving (models + given data)
 toy_model = "SYMH_SYMH_noise_t20_L2_amp"
 root_dir="./run_ibvp_cibvp/"
 
