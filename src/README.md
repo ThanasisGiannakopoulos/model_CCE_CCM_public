@@ -1,4 +1,4 @@
-## Some details on the code
+# Some details on the code
 
 The script "./model_CCE_CCM.jl" contains all the functions that are
 called in the examples to run CCE, CCM, as well as the IBVP and CIBVP
