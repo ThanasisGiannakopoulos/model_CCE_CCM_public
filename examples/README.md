@@ -1,4 +1,4 @@
-## Usage
+# Usage
 
 This directory contains scripts that run the simulations and produce
 the data to be used for the convergence analysis. The convergence
