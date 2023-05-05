@@ -12,7 +12,9 @@ The scripts here perform simulations for:
 + "run_ibvp_cibvp_noise.jl": IBVP and CIBVP independently, with noisy given data 
 
 Within these scripts and below the sign
+
 ![here](../figures/play.png)
+
 there are various parameters of the simulations, which you need to
 tune according to your goal. The parameters set the folder name where
 data are stored, the number of points of the numerical grid and the
