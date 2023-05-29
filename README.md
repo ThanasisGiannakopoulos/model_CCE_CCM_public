@@ -103,30 +103,30 @@ second prescription of boundary data (via time derivative) are:
 
 1) homogeneous IBVP: SYMH top and WH bottom (compare to FIG. 5 in the
 paper)
-![here](../figures/IBVP_plots/SYMH_vs_WH_noise_t20_tests1234.png)
+![here](./figures/IBVP_plots/SYMH_vs_WH_noise_t20_tests1234.pdf)
 
 2) homogeneous CIBVP: SYMH top and WH bottom (compare to FIG.6 in the
 paper)
-![here](../figures/CIBVP_plots/SYMH_vs_WH_noise_t20_tests1234.pdf)
+![here](./figures/CIBVP_plots/SYMH_vs_WH_noise_t20_tests1234.pdf)
 
 3) homogeneous SYMH-WH CCE: the WH CIBVP part (compare to FIG. 7 in
 the paper)
-![here](../figures/CCE_CIBVP_plots/SYMH_WH_noise_t20_tests1234.pdf)
+![here](./figures/CCE_CIBVP_plots/SYMH_WH_noise_t20_tests1234.pdf)
 
 4) homogeneous CCM: SYMH-SYMH top and WH-WH bottom (compare to FIG. 8
 in the paper)
-![here](../figures/CCM_plots/SYMH_SYMH_WH_WH_noise_t20_tests1234.pdf)
+![here](./figures/CCM_plots/SYMH_SYMH_WH_WH_noise_t20_tests1234.pdf)
 
 5) homogeneous CCM: SYMH-WH (compare to FIG. 9 in the paper)
-![here](../figures/CCM_plots/SYMH_WH_noise_t20_tests1234.pdf)
+![here](./figures/CCM_plots/SYMH_WH_noise_t20_tests1234.pdf)
 
 6) inhomogeneous CCM: SYMH B1-WH B2 (compare to FIG. 10 in the paper)
-![here](../figures/CCM_plots/SYMH_B1_WH_B2_noise_t20_tests1234.pdf)
+![here](./figures/CCM_plots/SYMH_B1_WH_B2_noise_t20_tests1234.pdf)
 
 7) for comparison with 6): SYMH B1-SYM B2 (left), WH B1-WH B2
 (middle), and the CIBVP part for CCE with SYMH B1-WH B2 (compare to
 FIG. 11 in the paper)
-![here](../figures/CCM_plots/inhom_CCM_CCE_comparison_tests234.pdf)
+![here](./figures/CCM_plots/inhom_CCM_CCE_comparison_tests234.pdf)
 
 Comparing the above with the ones presented in the paper, one can see
 that the method used to prescribe boundary data does not affect the
@@ -147,7 +147,7 @@ rate in the L2 norm. In the directory "./tools" one can find a Jupyter
 notebook that performs a pointwise convergence analysis.
 
 1) Boundary data provided via injection:
-![here](../figures/smooth_Cself_L2.pdf)
+![here](./figures/smooth_Cself_L2.pdf)
 
 2) Boundary data provided via time derivative:
-![here](../figures/smooth_Cself_L2_dtBD.pdf)
+![here](./figures/smooth_Cself_L2_dtBD.pdf)
