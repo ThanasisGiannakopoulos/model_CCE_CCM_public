@@ -1,9 +1,10 @@
 # Toy models for Cauchy-Characteristic Extraction (CCE) and Matching (CCM)
  
-This repository contains the code used in the paper [arxiv XXX.XXXXX](...).
-The goal of this work is to analyze the numerical convergence of CCE and CCM
-for toy models that mimic the hyperbolic structure of the general relativistic PDE systems
-used in CCE and CCM. The implemented models are the following:
+This repository contains the code used in the paper [arxiv
+XXX.XXXXX](...).  The goal of this work is to analyze the numerical
+convergence of CCE and CCM for toy models that mimic the hyperbolic
+structure of the general relativistic PDE systems used in CCE and
+CCM. The implemented models are the following:
 
 - for the Initial Boundary Value Problem (IBVP):
 $$\partial_t \phi_1 = - v_{\phi_1} \partial_\rho \phi_1 + a_{z11} \partial_z \phi_1 + a_{z12} \partial_z \psi_{v 1} + a_{z13} \partial_z \psi_1 + b_{11} \phi_1 + b_{12} \psi_{v 1} + b_{13}\psi_1 $$ 
@@ -59,7 +60,7 @@ pkg> add .
 ## Usage
 
 This section gives the recipe to create the convergence plots
-presented in [arxiv XXX.XXXXX](...).
+presented in the paper.
 
 + Open your terminal
 + Change to the directory "./examples"
@@ -88,3 +89,65 @@ scripts). Then, you can produce the figures by running the Jupyter
 notebook "./tools/tests_1234_noise_ccm.ipynb", where you have to
 change again the paths to point to the directories where the norms are
 saved. See "./tools/README.md" for more details.
+
+
+## Convergence plots: boundary data via time derivative
+
+The paper presents convergence tests for noisy given data, for a
+numerical algorithm were the boundary data are provided as an
+injection on the relevant function. Another technique to prescribe
+boundary data is to provide the time derivative of the relevant
+function, and not the function itself. The results however are
+qualitatively the same in both cases. The convergence tests for the
+second prescription of boundary data (via time derivative) are:
+
+1) homogeneous IBVP: SYMH top and WH bottom (compare to FIG. 5 in the
+paper)
+![here](../figures/IBVP_plots/SYMH_vs_WH_noise_t20_tests1234.pdf)
+
+2) homogeneous CIBVP: SYMH top and WH bottom (compare to FIG.6 in the
+paper)
+![here](../figures/CIBVP_plots/SYMH_vs_WH_noise_t20_tests1234.pdf)
+
+3) homogeneous SYMH-WH CCE: the WH CIBVP part (compare to FIG. 7 in
+the paper)
+![here](../figures/CCE_CIBVP_plots/SYMH_WH_noise_t20_tests1234.pdf)
+
+4) homogeneous CCM: SYMH-SYMH top and WH-WH bottom (compare to FIG. 8
+in the paper)
+![here](../figures/CCM_plots/SYMH_SYMH_WH_WH_noise_t20_tests1234.pdf)
+
+5) homogeneous CCM: SYMH-WH (compare to FIG. 9 in the paper)
+![here](../figures/CCM_plots/SYMH_WH_noise_t20_tests1234.pdf)
+
+6) inhomogeneous CCM: SYMH B1-WH B2 (compare to FIG. 10 in the paper)
+![here](../figures/CCM_plots/SYMH_B1_WH_B2_noise_t20_tests1234.pdf)
+
+7) for comparison with 6): SYMH B1-SYM B2 (left), WH B1-WH B2
+(middle), and the CIBVP part for CCE with SYMH B1-WH B2 (compare to
+FIG. 11 in the paper)
+![here](../figures/CCM_plots/inhom_CCM_CCE_comparison_tests234.pdf)
+
+Comparing the above with the ones presented in the paper, one can see
+that the method used to prescribe boundary data does not affect the
+results (at least for the two methods explored).
+
+
+## Convergence plots: smooth data
+
+In the paper we focus on tests with noisy given data, since these are
+important to detect the effect of weak hyperbolicity in numerical
+experiments. We further argued that one might miss this effect with
+only smooth data, as for instance was seen in [arxiv
+2007.06419](https://arxiv.org/abs/2007.06419). For completeness, we
+perform smooth convergence tests for both boundary data methods, for
+the setup that exhibit complete loss of convergence with noisy data,
+that is CCM with SYMH B1-WH B2. We present below the self convergence
+rate in the L2 norm. In the directory "./tools" one can find a Jupyter
+notebook that performs a pointwise convergence analysis.
+
+1) Boundary data provided via injection:
+![here](../figures/smooth_Cself_L2.pdf)
+
+2) Boundary data provided via time derivative:
+![here](../figures/smooth_Cself_L2_dtBD.pdf)

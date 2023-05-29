@@ -1,5 +1,7 @@
 module model_CCE_CCM
 
+#include("./modelC_CCE_CCM_dtBD.jl")
+
 export Param, IBVP, CIBVP # needed to read parameters of the discretization and of the PDE structure for the IBVP and CIBVP
 export run_ibvp_cibvp, run_cce, run_ccm # exports functions that are called during the run of an example
 
