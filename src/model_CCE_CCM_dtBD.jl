@@ -440,7 +440,7 @@ function run_ibvp_cibvp_dtBD(p::Param, ibvp::IBVP, cibvp::CIBVP)
         it += 1
         t  += dt
         
-        time_evol_ibvp_cibvp_dtD!(t, dt,
+        time_evol_ibvp_cibvp_dtBD!(t, dt,
                    v, v1, v2, v3, v4,
                    null_v,
                    null_v1, null_v2,
