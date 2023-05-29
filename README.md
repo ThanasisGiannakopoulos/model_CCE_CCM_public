@@ -115,16 +115,16 @@ the paper)
 
 4) homogeneous CCM: SYMH-SYMH top and WH-WH bottom (compare to FIG. 8
 in the paper)
-![here](./figures/noisy_convergence_dtBD/CCM_plots/SYMH_SYMH_WH_WH_noise_t20_tests1234.png)
+![here](./figures/noisy_convergence_dtBD/CCM_plots/SYMH_SYMH_WH_WH_tests1234.png)
 
 5) homogeneous CCM: SYMH-WH (compare to FIG. 9 in the paper)
-![here](./figures/noisy_convergence_dtBD/CCM_plots/SYMH_WH_noise_t20_tests1234.png)
+![here](./figures/noisy_convergence_dtBD/CCM_plots/SYMH_WH_tests1234.png)
 
 6) inhomogeneous CCM: SYMH B1-WH B2 (compare to FIG. 10 in the paper)
-![here](./figures/noisy_convergence_dtBD/CCM_plots/SYMH_B1_WH_B2_noise_t20_tests1234.png)
+![here](./figures/noisy_convergence_dtBD/CCM_plots/SYMH_B1_WH_B2_tests1234.png)
 
-7) for comparison with 6): SYMH B1-SYM B2 (left), WH B1-WH B2
-(middle), and the CIBVP part for CCE with SYMH B1-WH B2 (compare to
+7) for comparison with 6): SYMH B1-SYM B2 left, WH B1-WH B2
+middle, and on the right the CIBVP part for CCE with SYMH B1-WH B2 (compare to
 FIG. 11 in the paper)
 ![here](./figures/noisy_convergence_dtBD/CCM_plots/inhom_CCM_CCE_comparison_tests234.png)
 
