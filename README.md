@@ -103,7 +103,7 @@ second prescription of boundary data (via time derivative) are:
 
 1) homogeneous IBVP: SYMH top and WH bottom (compare to FIG. 5 in the
 paper)
-![here](../figures/IBVP_plots/SYMH_vs_WH_noise_t20_tests1234.pdf)
+![here](../figures/IBVP_plots/SYMH_vs_WH_noise_t20_tests1234.png)
 
 2) homogeneous CIBVP: SYMH top and WH bottom (compare to FIG.6 in the
 paper)
