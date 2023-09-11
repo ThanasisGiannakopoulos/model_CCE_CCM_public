@@ -86,7 +86,7 @@ scripts "./tools/L2_norm_exact_ccm.jl" and "dev_norms_exact_ccm.jl",
 one time for each case (you need to appropriately change the path that
 points to each directory with the relevant data, in each of the two
 scripts). Then, you can produce the figures by running the Jupyter
-notebook "./tools/tests_1234_noise_ccm.ipynb", where you have to
+notebook "./tools/all_tests_noise_ccm.ipynb", where you have to
 change again the paths to point to the directories where the norms are
 saved. See "./tools/README.md" for more details.
 
@@ -103,30 +103,30 @@ second prescription of boundary data (via time derivative) are:
 
 1) homogeneous IBVP: SYMH top and WH bottom (compare to FIG. 5 in the
 paper)
-![here](./figures/noisy_convergence_dtBD/IBVP_plots/SYMH_vs_WH_noise_t20_tests1234.png)
+![here](./figures/noisy_convergence_dtBD/IBVP_plots/SYMH_vs_WH_noise_t20_all_tests.png)
 
 2) homogeneous CIBVP: SYMH top and WH bottom (compare to FIG.6 in the
 paper)
-![here](./figures/noisy_convergence_dtBD/CIBVP_plots/SYMH_vs_WH_noise_t20_tests1234.png)
+![here](./figures/noisy_convergence_dtBD/CIBVP_plots/SYMH_vs_WH_noise_t20_all_tests.png)
 
 3) homogeneous SYMH-WH CCE: the WH CIBVP part (compare to FIG. 7 in
 the paper)
-![here](./figures/noisy_convergence_dtBD/CCE_CIBVP_plots/SYMH_WH_noise_t20_tests1234.png)
+![here](./figures/noisy_convergence_dtBD/CCE_CIBVP_plots/SYMH_WH_noise_t20_all_tests.png)
 
 4) homogeneous CCM: SYMH-SYMH top and WH-WH bottom (compare to FIG. 8
 in the paper)
-![here](./figures/noisy_convergence_dtBD/CCM_plots/SYMH_SYMH_WH_WH_tests1234.png)
+![here](./figures/noisy_convergence_dtBD/CCM_plots/SYMH_SYMH_WH_WH_all_tests.png)
 
 5) homogeneous CCM: SYMH-WH (compare to FIG. 9 in the paper)
-![here](./figures/noisy_convergence_dtBD/CCM_plots/SYMH_WH_tests1234.png)
+![here](./figures/noisy_convergence_dtBD/CCM_plots/SYMH_WH_all_tests.png)
 
 6) inhomogeneous CCM: SYMH B1-WH B2 (compare to FIG. 10 in the paper)
-![here](./figures/noisy_convergence_dtBD/CCM_plots/SYMH_B1_WH_B2_tests1234.png)
+![here](./figures/noisy_convergence_dtBD/CCM_plots/SYMH_B1_WH_B2_all_tests.png)
 
 7) for comparison with 6): SYMH B1-SYM B2 left, WH B1-WH B2
 middle, and on the right the CIBVP part for CCE with SYMH B1-WH B2 (compare to
 FIG. 11 in the paper)
-![here](./figures/noisy_convergence_dtBD/CCM_plots/inhom_CCM_CCE_comparison_tests234.png)
+![here](./figures/noisy_convergence_dtBD/CCM_plots/inhom_CCM_CCE_comparison_all_tests.png)
 
 Comparing the above with the ones presented in the paper, one can see
 that the method used to prescribe boundary data does not affect the
