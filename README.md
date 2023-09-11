@@ -1,7 +1,7 @@
 # Toy models for Cauchy-Characteristic Extraction (CCE) and Matching (CCM)
  
-This repository contains the code used in the paper [arxiv
-XXX.XXXXX](...).  The goal of this work is to analyze the numerical
+This repository contains the code used in the paper [arXiv:2306.13010](https://arxiv.org/abs/2306.13010).
+The goal of this work is to analyze the numerical
 convergence of CCE and CCM for toy models that mimic the hyperbolic
 structure of the general relativistic PDE systems used in CCE and
 CCM. The implemented models are the following:
