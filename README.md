@@ -132,6 +132,21 @@ Comparing the above with the ones presented in the paper, one can see
 that the method used to prescribe boundary data does not affect the
 results (at least for the two methods explored).
 
+## Convergence plots: different CCE scenarios
+
+In subsection III.C of the paper, different scenarios for CCE are
+discussed. In figure 7 of the paper however, we presented only the
+results of the convergence test for the scenario where the IBVP is
+SYMH and the CIBVP WH. Here were present the same test for SYMH-SYMH
+and WH-WH CCE as well. The boundary data are given with pure injection.
+
+1) homogeneous SYMH-SYMH CCE: the SYMH CIBVP part (compare to FIG. 7
+in the paper)
+![here](./figures/noisy_convergence_extra/CCE_CIBVP_plots/SYMH_SYMH_noise_t20_all_tests.png)
+
+2) homogenenous WH-WH CCE: the WH CIBVP part (compare to FIG.7 in the
+paper)
+![here](./figures/noisy_convergence_extra/CCE_CIBVP_plots/WH_WH_noise_t20_all_tests.png)
 
 ## Convergence plots: smooth data
 
